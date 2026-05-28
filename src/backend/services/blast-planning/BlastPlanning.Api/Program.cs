@@ -2,6 +2,8 @@ using BlastPlanning.Application.BlastPlans.Commands.ApproveBlastPlan;
 using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
 using BlastPlanning.Infrastructure;
 using MediatR;
+using BlastPlanning.Domain.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,6 +34,53 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Exception handling at top level to ensure meaningful response to clients
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        var exception = context.Features
+            .Get<IExceptionHandlerFeature>()?
+            .Error;
+
+        context.Response.ContentType = "application/problem+json";
+
+        switch (exception)
+        {
+            case InvalidBlastPlanStateException:
+                context.Response.StatusCode = StatusCodes.Status409Conflict;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    title = "Invalid blast plan state",
+                    status = StatusCodes.Status409Conflict,
+                    detail = exception.Message
+                });
+                break;
+
+            case DomainValidationException:
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    title = "Domain validation failed",
+                    status = StatusCodes.Status400BadRequest,
+                    detail = exception.Message
+                });
+                break;
+
+            default:
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    title = "Unexpected error",
+                    status = StatusCodes.Status500InternalServerError
+                });
+                break;
+        }
+    });
+});
+
+
 
 // Add a blast plan
 app.MapPost("/blast-plans", async (
