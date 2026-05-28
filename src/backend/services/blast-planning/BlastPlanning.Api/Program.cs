@@ -1,3 +1,4 @@
+using BlastPlanning.Application.BlastPlans.Commands.ApproveBlastPlan;
 using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
 using BlastPlanning.Infrastructure;
 using MediatR;
@@ -32,6 +33,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Add a blast plan
 app.MapPost("/blast-plans", async (
     CreateBlastPlanRequest request,
     ISender sender,
@@ -48,6 +50,19 @@ app.MapPost("/blast-plans", async (
         result);
 });
 
+// Approve a blast plan
+app.MapPost("/blast-plans/{id:guid}/approve", async (
+    Guid id,
+    ApproveBlastPlanRequest request,
+    ISender sender,
+    CancellationToken cancellationToken) =>
+{
+    await sender.Send(
+        new ApproveBlastPlanCommand(id, request.ApprovedBy),
+        cancellationToken);
+
+    return Results.NoContent();
+});
 
 // Legacy endpoint for testing only - to be removed
 var summaries = new[]
@@ -75,7 +90,13 @@ public sealed record CreateBlastPlanRequest(
     string Name,
     string SiteId);
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+public sealed record ApproveBlastPlanRequest(
+    string ApprovedBy);
+
+record WeatherForecast(
+    DateOnly Date, 
+    int TemperatureC, 
+    string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
