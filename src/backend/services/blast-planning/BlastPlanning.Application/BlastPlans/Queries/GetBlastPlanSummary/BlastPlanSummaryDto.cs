@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
 
-namespace BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary
-{
-    internal class BlastPlanSummaryDto
-    {
-    }
-}
+public sealed record BlastPlanSummaryDto(
+    Guid BlastPlanId,
+    string Name,
+    string SiteId,
+    string Status,
+    DateTimeOffset CreatedUtc,
+    DateTimeOffset? ApprovedUtc);

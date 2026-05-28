@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using MediatR;
 
-namespace BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary
-{
-    internal class GetBlastPlanSummaryQuery
-    {
-    }
-}
+namespace BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+
+public sealed record GetBlastPlanSummaryQuery(Guid BlastPlanId)
+    : IRequest<BlastPlanSummaryDto?>;

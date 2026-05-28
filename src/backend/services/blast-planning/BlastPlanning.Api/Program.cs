@@ -1,5 +1,6 @@
 using BlastPlanning.Application.BlastPlans.Commands.ApproveBlastPlan;
 using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
+using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
 using BlastPlanning.Infrastructure;
 using MediatR;
 using BlastPlanning.Domain.Exceptions;
@@ -112,6 +113,22 @@ app.MapPost("/blast-plans/{id:guid}/approve", async (
 
     return Results.NoContent();
 });
+
+// Get a blast plan summary
+app.MapGet("/blast-plans/{id:guid}", async (
+    Guid id,
+    ISender sender,
+    CancellationToken cancellationToken) =>
+{
+    var result = await sender.Send(
+        new GetBlastPlanSummaryQuery(id),
+        cancellationToken);
+
+    return result is null
+        ? Results.NotFound()
+        : Results.Ok(result);
+});
+
 
 // Legacy endpoint for testing only - to be removed
 var summaries = new[]
