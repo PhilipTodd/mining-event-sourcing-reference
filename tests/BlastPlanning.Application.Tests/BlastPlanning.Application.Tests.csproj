@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\backend\services\blast-planning\BlastPlanning.Application\BlastPlanning.Application.csproj" />
     <ProjectReference Include="..\..\src\backend\services\blast-planning\BlastPlanning.Domain\BlastPlanning.Domain.csproj" />
+    <ProjectReference Include="..\..\src\backend\services\blast-planning\BlastPlanning.Infrastructure\BlastPlanning.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

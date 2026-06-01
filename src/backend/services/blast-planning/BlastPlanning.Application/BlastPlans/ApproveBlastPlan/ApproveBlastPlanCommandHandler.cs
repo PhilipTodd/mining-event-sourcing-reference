@@ -20,6 +20,12 @@ public sealed class ApproveBlastPlanCommandHandler(
             streamId,
             cancellationToken);
 
+        if (events.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"Blast plan '{request.BlastPlanId}' was not found.");
+        }
+        
         var blastPlan = BlastPlan.FromHistory(events);
 
         blastPlan.Approve(
