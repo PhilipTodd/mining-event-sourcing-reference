@@ -1,10 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using BlastPlanning.Application.Abstractions.EventStore;
 using BlastPlanning.Domain.Events;
+using BlastPlanning.Infrastructure.Projections.BlastPlans;
 
 namespace BlastPlanning.Infrastructure.EventStore.InMemory;
 
-public sealed class InMemoryEventStore : IEventStore
+public sealed class InMemoryEventStore(BlastPlanProjector projector) : IEventStore
 {
     private readonly ConcurrentDictionary<string, List<IDomainEvent>> _streams = new();
 
@@ -19,12 +20,17 @@ public sealed class InMemoryEventStore : IEventStore
         return Task.FromResult<IReadOnlyCollection<IDomainEvent>>(events);
     }
 
-    public Task AppendToStreamAsync(
+    public async Task AppendToStreamAsync(
         string streamId,
         long expectedVersion,
         IReadOnlyCollection<IDomainEvent> events,
         CancellationToken cancellationToken = default)
     {
+        if (events.Count == 0)
+        {
+            return;
+        }
+
         var stream = _streams.GetOrAdd(streamId, _ => []);
 
         lock (stream)
@@ -40,6 +46,9 @@ public sealed class InMemoryEventStore : IEventStore
             stream.AddRange(events);
         }
 
-        return Task.CompletedTask;
+        foreach (var domainEvent in events)
+        {
+            await projector.ProjectAsync(domainEvent, cancellationToken);
+        }
     }
 }

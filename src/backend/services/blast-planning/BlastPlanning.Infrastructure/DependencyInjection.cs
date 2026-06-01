@@ -4,6 +4,9 @@ using BlastPlanning.Infrastructure.Clock;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
 using BlastPlanning.Infrastructure.Persistence.Sql;
 using BlastPlanning.Infrastructure.EventStore.InMemory;
+using BlastPlanning.Application.Abstractions.ReadModels;
+using BlastPlanning.Infrastructure.Projections.BlastPlans;
+using BlastPlanning.Infrastructure.Projections.InMemory;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +27,8 @@ public static class DependencyInjection
 
         services.AddSingleton<IClock, SystemClock>();
         services.AddSingleton<IEventStore, InMemoryEventStore>();
+        services.AddSingleton<IBlastPlanReadRepository, InMemoryBlastPlanReadRepository>();
+        services.AddSingleton<BlastPlanProjector>();
 
         // commenting the below until Cosmos integration is complete. Temporarily using InMemoryEventStore for dev.
         //services.AddScoped<IEventStore, CosmosEventStore>();
