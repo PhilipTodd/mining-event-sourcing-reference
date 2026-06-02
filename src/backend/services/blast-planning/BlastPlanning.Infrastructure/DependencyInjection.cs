@@ -26,19 +26,28 @@ public static class DependencyInjection
             configuration.GetSection(SqlOptions.SectionName));
 
         services.AddSingleton<IClock, SystemClock>();
-        services.AddSingleton<IEventStore, InMemoryEventStore>();
         services.AddSingleton<IBlastPlanReadRepository, InMemoryBlastPlanReadRepository>();
         services.AddSingleton<BlastPlanProjector>();
 
-        // commenting the below until Cosmos integration is complete. Temporarily using InMemoryEventStore for dev.
-        //services.AddScoped<IEventStore, CosmosEventStore>();
-        //services.AddSingleton(sp =>
-        //{
-        //    var options = sp.GetRequiredService<
-        //        Microsoft.Extensions.Options.IOptions<CosmosEventStoreOptions>>().Value;
+        var useInMemoryEventStore =
+            configuration.GetValue<bool>("UseInMemoryEventStore");
 
-        //    return new CosmosClient(options.ConnectionString);
-        //});
+        if (useInMemoryEventStore)
+        {
+            services.AddSingleton<IEventStore, InMemoryEventStore>();
+        }
+        else
+        {
+            services.AddSingleton(sp =>
+            {
+                var options = sp.GetRequiredService<
+                    Microsoft.Extensions.Options.IOptions<CosmosEventStoreOptions>>().Value;
+
+                return new CosmosClient(options.ConnectionString);
+            });
+
+            services.AddScoped<IEventStore, CosmosEventStore>();
+        }
 
         services.AddScoped<SqlConnectionFactory>();
 
