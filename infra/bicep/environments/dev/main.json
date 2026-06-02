@@ -1,0 +1,181 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.43.8.12551",
+      "templateHash": "10780637328767805772"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]"
+    },
+    "environmentName": {
+      "type": "string"
+    },
+    "projectName": {
+      "type": "string"
+    },
+    "cosmosAccountName": {
+      "type": "string"
+    },
+    "cosmosDatabaseName": {
+      "type": "string"
+    },
+    "cosmosContainerName": {
+      "type": "string"
+    },
+    "cosmosThroughput": {
+      "type": "int",
+      "defaultValue": 400
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('cosmos-{0}-{1}', parameters('projectName'), parameters('environmentName'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "accountName": {
+            "value": "[parameters('cosmosAccountName')]"
+          },
+          "databaseName": {
+            "value": "[parameters('cosmosDatabaseName')]"
+          },
+          "containerName": {
+            "value": "[parameters('cosmosContainerName')]"
+          },
+          "throughput": {
+            "value": "[parameters('cosmosThroughput')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.43.8.12551",
+              "templateHash": "13195896210738451619"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "accountName": {
+              "type": "string"
+            },
+            "databaseName": {
+              "type": "string"
+            },
+            "containerName": {
+              "type": "string"
+            },
+            "throughput": {
+              "type": "int",
+              "defaultValue": 400
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts",
+              "apiVersion": "2024-05-15",
+              "name": "[parameters('accountName')]",
+              "location": "[parameters('location')]",
+              "kind": "GlobalDocumentDB",
+              "properties": {
+                "enableFreeTier": true,
+                "databaseAccountOfferType": "Standard",
+                "consistencyPolicy": {
+                  "defaultConsistencyLevel": "Session"
+                },
+                "locations": [
+                  {
+                    "locationName": "[parameters('location')]",
+                    "failoverPriority": 0,
+                    "isZoneRedundant": false
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+              "apiVersion": "2024-05-15",
+              "name": "[format('{0}/{1}', parameters('accountName'), parameters('databaseName'))]",
+              "properties": {
+                "resource": {
+                  "id": "[parameters('databaseName')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts', parameters('accountName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers",
+              "apiVersion": "2024-05-15",
+              "name": "[format('{0}/{1}/{2}', parameters('accountName'), parameters('databaseName'), parameters('containerName'))]",
+              "properties": {
+                "resource": {
+                  "id": "[parameters('containerName')]",
+                  "partitionKey": {
+                    "paths": [
+                      "/streamId"
+                    ],
+                    "kind": "Hash"
+                  }
+                },
+                "options": {
+                  "throughput": "[parameters('throughput')]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DocumentDB/databaseAccounts/sqlDatabases', parameters('accountName'), parameters('databaseName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "accountName": {
+              "type": "string",
+              "value": "[parameters('accountName')]"
+            },
+            "databaseName": {
+              "type": "string",
+              "value": "[parameters('databaseName')]"
+            },
+            "containerName": {
+              "type": "string",
+              "value": "[parameters('containerName')]"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "cosmosAccountName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('cosmos-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.accountName.value]"
+    },
+    "cosmosDatabaseName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('cosmos-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.databaseName.value]"
+    },
+    "cosmosContainerName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('cosmos-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.containerName.value]"
+    }
+  }
+}
