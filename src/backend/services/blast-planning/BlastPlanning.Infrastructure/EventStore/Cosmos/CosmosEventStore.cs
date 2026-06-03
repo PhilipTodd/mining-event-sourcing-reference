@@ -1,5 +1,6 @@
 ﻿using BlastPlanning.Application.Abstractions.EventStore;
 using BlastPlanning.Domain.Events;
+using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Options;
 using System.Collections.Concurrent;
@@ -12,16 +13,20 @@ public sealed class CosmosEventStore : IEventStore
 {
     private readonly CosmosContainer _container;
     private readonly CosmosEventSerializer _serializer = new();
+    private readonly BlastPlanProjector _projector;
 
     public CosmosEventStore(
         CosmosClient cosmosClient,
-        IOptions<CosmosEventStoreOptions> options)
+        IOptions<CosmosEventStoreOptions> options,
+        BlastPlanProjector projector)
     {
         var value = options.Value;
 
         _container = cosmosClient.GetContainer(
             value.DatabaseName,
             value.ContainerName);
+
+        _projector = projector;
     }
 
     public async Task<IReadOnlyCollection<IDomainEvent>> LoadStreamAsync(
@@ -94,6 +99,11 @@ public sealed class CosmosEventStore : IEventStore
                 document,
                 new PartitionKey(streamId),
                 cancellationToken: cancellationToken);
+
+            ///This is a temporary synchronous projection approach. Insert into SQL server immediately.
+            await _projector.ProjectAsync(
+                domainEvent,
+                cancellationToken);
         }
     }
 
