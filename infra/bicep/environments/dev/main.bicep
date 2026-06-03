@@ -1,12 +1,21 @@
 targetScope = 'resourceGroup'
 
 param location string = resourceGroup().location
+
 param environmentName string
 param projectName string
+
 param cosmosAccountName string
 param cosmosDatabaseName string
 param cosmosContainerName string
 param cosmosThroughput int = 400
+
+param sqlServerName string
+param sqlDatabaseName string
+param sqlAdministratorLogin string
+
+@secure()
+param sqlAdministratorLoginPassword string
 
 module cosmos '../../modules/cosmosdb.bicep' = {
   name: 'cosmos-${projectName}-${environmentName}'
@@ -19,6 +28,21 @@ module cosmos '../../modules/cosmosdb.bicep' = {
   }
 }
 
+module sql '../../modules/sql.bicep' = {
+  name: 'sql-${projectName}-${environmentName}'
+  params: {
+    location: location
+    sqlServerName: sqlServerName
+    sqlDatabaseName: sqlDatabaseName
+    administratorLogin: sqlAdministratorLogin
+    administratorLoginPassword: sqlAdministratorLoginPassword
+  }
+}
+
 output cosmosAccountName string = cosmos.outputs.accountName
 output cosmosDatabaseName string = cosmos.outputs.databaseName
 output cosmosContainerName string = cosmos.outputs.containerName
+
+output sqlServerName string = sql.outputs.sqlServerName
+output sqlDatabaseName string = sql.outputs.sqlDatabaseName
+output sqlServerFullyQualifiedDomainName string = sql.outputs.sqlServerFullyQualifiedDomainName

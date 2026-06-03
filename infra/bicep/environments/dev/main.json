@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.43.8.12551",
-      "templateHash": "10780637328767805772"
+      "templateHash": "17540310962310427401"
     }
   },
   "parameters": {
@@ -31,6 +31,18 @@
     "cosmosThroughput": {
       "type": "int",
       "defaultValue": 400
+    },
+    "sqlServerName": {
+      "type": "string"
+    },
+    "sqlDatabaseName": {
+      "type": "string"
+    },
+    "sqlAdministratorLogin": {
+      "type": "string"
+    },
+    "sqlAdministratorLoginPassword": {
+      "type": "securestring"
     }
   },
   "resources": [
@@ -162,6 +174,132 @@
           }
         }
       }
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "[format('sql-{0}-{1}', parameters('projectName'), parameters('environmentName'))]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "sqlServerName": {
+            "value": "[parameters('sqlServerName')]"
+          },
+          "sqlDatabaseName": {
+            "value": "[parameters('sqlDatabaseName')]"
+          },
+          "administratorLogin": {
+            "value": "[parameters('sqlAdministratorLogin')]"
+          },
+          "administratorLoginPassword": {
+            "value": "[parameters('sqlAdministratorLoginPassword')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.43.8.12551",
+              "templateHash": "1318522994940584161"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "sqlServerName": {
+              "type": "string"
+            },
+            "sqlDatabaseName": {
+              "type": "string"
+            },
+            "administratorLogin": {
+              "type": "string"
+            },
+            "administratorLoginPassword": {
+              "type": "securestring"
+            },
+            "databaseSkuName": {
+              "type": "string",
+              "defaultValue": "Basic"
+            },
+            "databaseSkuTier": {
+              "type": "string",
+              "defaultValue": "Basic"
+            },
+            "databaseSkuCapacity": {
+              "type": "int",
+              "defaultValue": 5
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Sql/servers",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[parameters('sqlServerName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "administratorLogin": "[parameters('administratorLogin')]",
+                "administratorLoginPassword": "[parameters('administratorLoginPassword')]",
+                "minimalTlsVersion": "1.2",
+                "publicNetworkAccess": "Enabled"
+              }
+            },
+            {
+              "type": "Microsoft.Sql/servers/databases",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('sqlServerName'), parameters('sqlDatabaseName'))]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('databaseSkuName')]",
+                "tier": "[parameters('databaseSkuTier')]",
+                "capacity": "[parameters('databaseSkuCapacity')]"
+              },
+              "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', parameters('sqlServerName'), 'AllowAzureServices')]",
+              "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', parameters('sqlServerName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "sqlServerName": {
+              "type": "string",
+              "value": "[parameters('sqlServerName')]"
+            },
+            "sqlDatabaseName": {
+              "type": "string",
+              "value": "[parameters('sqlDatabaseName')]"
+            },
+            "sqlServerFullyQualifiedDomainName": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Sql/servers', parameters('sqlServerName')), '2023-08-01-preview').fullyQualifiedDomainName]"
+            }
+          }
+        }
+      }
     }
   ],
   "outputs": {
@@ -176,6 +314,18 @@
     "cosmosContainerName": {
       "type": "string",
       "value": "[reference(resourceId('Microsoft.Resources/deployments', format('cosmos-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.containerName.value]"
+    },
+    "sqlServerName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('sql-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.sqlServerName.value]"
+    },
+    "sqlDatabaseName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('sql-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.sqlDatabaseName.value]"
+    },
+    "sqlServerFullyQualifiedDomainName": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Resources/deployments', format('sql-{0}-{1}', parameters('projectName'), parameters('environmentName'))), '2025-04-01').outputs.sqlServerFullyQualifiedDomainName.value]"
     }
   }
 }
