@@ -1,10 +1,13 @@
-﻿using BlastPlanning.Domain.Events;
+﻿using BlastPlanning.Application.Abstractions.ReadModels;
+using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
+using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace BlastPlanning.Infrastructure.Tests.EventStore;
 
@@ -41,7 +44,15 @@ public sealed class CosmosEventStoreTests : IAsyncLifetime
             ContainerName = ContainerName
         });
 
-        _eventStore = new CosmosEventStore(_cosmosClient, options);
+        var readRepository = new FakeBlastPlanReadRepository();
+
+        var projector = new BlastPlanProjector(
+            readRepository);
+
+        _eventStore = new CosmosEventStore(
+            _cosmosClient,
+            options,
+            projector);
     }
 
     public async Task InitializeAsync()
@@ -162,4 +173,29 @@ public sealed class CosmosEventStoreTests : IAsyncLifetime
             .ThrowAsync<InvalidOperationException>()
             .WithMessage("*Concurrency conflict*");
     }
+
+    private sealed class FakeBlastPlanReadRepository
+    : IBlastPlanReadRepository
+    {
+        private readonly Dictionary<Guid, BlastPlanSummaryDto> _items = [];
+
+        public Task<BlastPlanSummaryDto?> GetAsync(
+            Guid blastPlanId,
+            CancellationToken cancellationToken = default)
+        {
+            _items.TryGetValue(blastPlanId, out var result);
+
+            return Task.FromResult(result);
+        }
+
+        public Task SaveAsync(
+            BlastPlanSummaryDto summary,
+            CancellationToken cancellationToken = default)
+        {
+            _items[summary.BlastPlanId] = summary;
+
+            return Task.CompletedTask;
+        }
+    }
+
 }
