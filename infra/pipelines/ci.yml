@@ -13,7 +13,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  solutionPath: '**/**/*.sln'
+  solutionPath: '**/**/*.slnx'
 
 steps:
   - task: UseDotNet@2
