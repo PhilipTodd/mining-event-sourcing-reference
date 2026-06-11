@@ -45,7 +45,9 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --template-file $(templateFile) \
                   --parameters $(parametersFile) \
-                  --parameters sqlAdministratorLoginPassword="$(SqlAdministratorLoginPassword)"
+                  --parameters sqlAdministratorLoginPassword="$SQL_ADMIN_PASSWORD"
+            env:    
+              SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
 
   - stage: WhatIf
     displayName: 'What-If'
@@ -65,7 +67,9 @@ stages:
                   --resource-group $(resourceGroupName) \
                   --template-file $(templateFile) \
                   --parameters $(parametersFile) \
-                  --parameters sqlAdministratorLoginPassword="$(SqlAdministratorLoginPassword)"
+                  --parameters sqlAdministratorLoginPassword="$SQL_ADMIN_PASSWORD"
+            env:    
+              SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
 
   - stage: Deploy
     displayName: 'Deploy Infrastructure'
@@ -91,4 +95,6 @@ stages:
                         --resource-group $(resourceGroupName) \
                         --template-file $(templateFile) \
                         --parameters $(parametersFile) \
-                        --parameters sqlAdministratorLoginPassword="$(SqlAdministratorLoginPassword)"
+                        --parameters sqlAdministratorLoginPassword="$SQL_ADMIN_PASSWORD"
+                  env:    
+                    SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
