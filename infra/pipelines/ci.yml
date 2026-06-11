@@ -1,0 +1,46 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  solutionPath: '**/*.sln'
+
+steps:
+  - task: UseDotNet@2
+    displayName: 'Install .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      version: '10.x'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore'
+    inputs:
+      command: 'restore'
+      projects: '$(solutionPath)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build'
+    inputs:
+      command: 'build'
+      projects: '$(solutionPath)'
+      arguments: '--configuration $(buildConfiguration) --no-restore'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run unit tests'
+    inputs:
+      command: 'test'
+      projects: |
+        tests/BlastPlanning.Domain.Tests/*.csproj
+        tests/BlastPlanning.Application.Tests/*.csproj
+      arguments: '--configuration $(buildConfiguration) --no-build --logger trx'
+      publishTestResults: true
