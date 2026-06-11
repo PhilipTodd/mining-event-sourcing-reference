@@ -1,10 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace BlastPlanning.Application.Common.Exceptions;
 
-namespace BlastPlanning.Application.Common.Exceptions
-{
-    internal class NotFoundException
-    {
-    }
-}
+public sealed class NotFoundException(string message) : ApplicationException(message);

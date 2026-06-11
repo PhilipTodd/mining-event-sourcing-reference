@@ -1,6 +1,7 @@
 ﻿using BlastPlanning.Application.Abstractions.Clock;
 using BlastPlanning.Application.Abstractions.EventStore;
 using BlastPlanning.Application.BlastPlans.Commands.ApproveBlastPlan;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
 using FluentAssertions;
@@ -57,7 +58,7 @@ public sealed class ApproveBlastPlanCommandHandlerTests
             new ApproveBlastPlanCommand(Guid.NewGuid(), "user-001"),
             CancellationToken.None);
 
-        await act.Should().ThrowAsync<InvalidOperationException>();
+        await act.Should().ThrowAsync<NotFoundException>();
     }
 
     private sealed class FakeClock(DateTimeOffset utcNow) : IClock
@@ -94,7 +95,7 @@ public sealed class ApproveBlastPlanCommandHandlerTests
 
             if (currentVersion != expectedVersion)
             {
-                throw new InvalidOperationException("Concurrency conflict.");
+                throw new ConcurrencyException("Concurrency conflict.");
             }
 
             stream.AddRange(events);

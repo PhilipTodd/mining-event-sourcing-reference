@@ -1,5 +1,6 @@
 ﻿using BlastPlanning.Application.Abstractions.ReadModels;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
@@ -170,7 +171,7 @@ public sealed class CosmosEventStoreTests : IAsyncLifetime
             CancellationToken.None);
 
         await act.Should()
-            .ThrowAsync<InvalidOperationException>()
+            .ThrowAsync<ConcurrencyException>()
             .WithMessage("*Concurrency conflict*");
     }
 

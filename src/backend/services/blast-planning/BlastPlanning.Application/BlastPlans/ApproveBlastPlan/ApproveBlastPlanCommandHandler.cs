@@ -1,5 +1,6 @@
 ﻿using BlastPlanning.Application.Abstractions.Clock;
 using BlastPlanning.Application.Abstractions.EventStore;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Aggregates.BlastPlan;
 using MediatR;
 
@@ -22,7 +23,7 @@ public sealed class ApproveBlastPlanCommandHandler(
 
         if (events.Count == 0)
         {
-            throw new InvalidOperationException(
+            throw new NotFoundException(
                 $"Blast plan '{request.BlastPlanId}' was not found.");
         }
         

@@ -3,6 +3,7 @@ using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
 using BlastPlanning.Infrastructure;
 using MediatR;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Exceptions;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -47,37 +48,47 @@ app.UseExceptionHandler(errorApp =>
 
         context.Response.ContentType = "application/problem+json";
 
-        switch (exception)
+        var problem = exception switch
         {
-            case InvalidBlastPlanStateException:
-                context.Response.StatusCode = StatusCodes.Status409Conflict;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    title = "Invalid blast plan state",
-                    status = StatusCodes.Status409Conflict,
-                    detail = exception.Message
-                });
-                break;
+            NotFoundException => new
+            {
+                title = "Resource not found",
+                status = StatusCodes.Status404NotFound,
+                detail = exception.Message
+            },
 
-            case DomainValidationException:
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    title = "Domain validation failed",
-                    status = StatusCodes.Status400BadRequest,
-                    detail = exception.Message
-                });
-                break;
+            ConcurrencyException => new
+            {
+                title = "Concurrency conflict",
+                status = StatusCodes.Status409Conflict,
+                detail = exception.Message
+            },
 
-            default:
-                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsJsonAsync(new
-                {
-                    title = "Unexpected error",
-                    status = StatusCodes.Status500InternalServerError
-                });
-                break;
-        }
+            InvalidBlastPlanStateException => new
+            {
+                title = "Invalid blast plan state",
+                status = StatusCodes.Status409Conflict,
+                detail = exception.Message
+            },
+
+            DomainValidationException => new
+            {
+                title = "Domain validation failed",
+                status = StatusCodes.Status400BadRequest,
+                detail = exception.Message
+            },
+
+            _ => new
+            {
+                title = "Unexpected error",
+                status = StatusCodes.Status500InternalServerError,
+                detail = "An unexpected error occurred."
+            }
+        };
+
+        context.Response.StatusCode = problem.status;
+
+        await context.Response.WriteAsJsonAsync(problem);
     });
 });
 

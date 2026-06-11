@@ -1,6 +1,7 @@
 ﻿using BlastPlanning.Application.Abstractions.Clock;
 using BlastPlanning.Application.Abstractions.EventStore;
 using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using FluentAssertions;
 
@@ -69,7 +70,7 @@ public sealed class CreateBlastPlanCommandHandlerTests
 
             if (currentVersion != expectedVersion)
             {
-                throw new InvalidOperationException("Concurrency conflict.");
+                throw new ConcurrencyException("Concurrency conflict.");
             }
 
             stream.AddRange(events);

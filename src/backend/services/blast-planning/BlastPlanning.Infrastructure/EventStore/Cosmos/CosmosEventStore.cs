@@ -1,4 +1,5 @@
 ﻿using BlastPlanning.Application.Abstractions.EventStore;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using Microsoft.Azure.Cosmos;
@@ -77,7 +78,7 @@ public sealed class CosmosEventStore : IEventStore
 
         if (currentVersion != expectedVersion)
         {
-            throw new InvalidOperationException(
+            throw new ConcurrencyException(
                 $"Concurrency conflict for stream '{streamId}'. Expected version {expectedVersion}, actual version {currentVersion}.");
         }
 

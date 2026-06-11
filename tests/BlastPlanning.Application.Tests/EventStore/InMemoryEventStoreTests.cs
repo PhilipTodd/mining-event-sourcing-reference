@@ -1,5 +1,6 @@
 ﻿using BlastPlanning.Application.Abstractions.ReadModels;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
 using BlastPlanning.Infrastructure.EventStore.InMemory;
@@ -56,7 +57,7 @@ public sealed class InMemoryEventStoreTests
             [created],
             CancellationToken.None);
 
-        await act.Should().ThrowAsync<InvalidOperationException>()
+        await act.Should().ThrowAsync<ConcurrencyException>()
             .WithMessage("*Concurrency conflict*");
     }
 
