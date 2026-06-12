@@ -17,6 +17,10 @@ param sqlAdministratorLogin string
 @secure()
 param sqlAdministratorLoginPassword string
 
+param serviceBusNamespaceName string
+param serviceBusTopicName string = 'domain-events'
+param serviceBusSubscriptionName string = 'blast-plan-projections'
+
 module cosmos '../../modules/cosmosdb.bicep' = {
   name: 'cosmos-${projectName}-${environmentName}'
   params: {
@@ -39,6 +43,16 @@ module sql '../../modules/sql.bicep' = {
   }
 }
 
+module serviceBus '../../modules/servicebus.bicep' = {
+  name: 'servicebus-${projectName}-${environmentName}'
+  params: {
+    location: location
+    namespaceName: serviceBusNamespaceName
+    topicName: serviceBusTopicName
+    subscriptionName: serviceBusSubscriptionName
+  }
+}
+
 output cosmosAccountName string = cosmos.outputs.accountName
 output cosmosDatabaseName string = cosmos.outputs.databaseName
 output cosmosContainerName string = cosmos.outputs.containerName
@@ -46,3 +60,7 @@ output cosmosContainerName string = cosmos.outputs.containerName
 output sqlServerName string = sql.outputs.sqlServerName
 output sqlDatabaseName string = sql.outputs.sqlDatabaseName
 output sqlServerFullyQualifiedDomainName string = sql.outputs.sqlServerFullyQualifiedDomainName
+
+output serviceBusNamespaceName string = serviceBus.outputs.namespaceName
+output serviceBusTopicName string = serviceBus.outputs.topicName
+output serviceBusSubscriptionName string = serviceBus.outputs.subscriptionName
