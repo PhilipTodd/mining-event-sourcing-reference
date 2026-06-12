@@ -44,8 +44,7 @@ stages:
                 az deployment group validate \
                   --resource-group $(resourceGroupName) \
                   --template-file $(templateFile) \
-                  --parameters $(parametersFile) \
-                  --parameters sqlAdministratorLoginPassword="$SQL_ADMIN_PASSWORD"
+                  --parameters $(parametersFile) 
             env:    
               SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
 
@@ -66,8 +65,7 @@ stages:
                 az deployment group what-if \
                   --resource-group $(resourceGroupName) \
                   --template-file $(templateFile) \
-                  --parameters $(parametersFile) \
-                  --parameters sqlAdministratorLoginPassword="$SQL_ADMIN_PASSWORD"
+                  --parameters $(parametersFile) 
             env:    
               SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
 
@@ -94,7 +92,6 @@ stages:
                         --name deploy-esr-dev-infra-$(Build.BuildId) \
                         --resource-group $(resourceGroupName) \
                         --template-file $(templateFile) \
-                        --parameters $(parametersFile) \
-                        --parameters sqlAdministratorLoginPassword="$SQL_ADMIN_PASSWORD"
+                        --parameters $(parametersFile) 
                   env:    
                     SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
