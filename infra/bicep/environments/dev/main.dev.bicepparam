@@ -12,4 +12,4 @@ param cosmosThroughput = 400
 param sqlServerName = 'esr-dev-sql-readmodels'
 param sqlDatabaseName = 'BlastPlanningReadModels'
 param sqlAdministratorLogin = 'sqladmin'
-
+param sqlAdministratorLoginPassword = readEnvironmentVariable('SQL_ADMIN_PASSWORD')
