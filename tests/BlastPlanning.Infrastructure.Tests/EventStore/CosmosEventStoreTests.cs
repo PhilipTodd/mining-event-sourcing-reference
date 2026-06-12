@@ -5,6 +5,7 @@ using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
 using BlastPlanning.Infrastructure.Projections.BlastPlans;
+using BlastPlanning.Infrastructure.Messaging;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
@@ -50,10 +51,13 @@ public sealed class CosmosEventStoreTests : IAsyncLifetime
         var projector = new BlastPlanProjector(
             readRepository);
 
+        var eventPublisher = new InProcessEventPublisher(
+            projector);
+
         _eventStore = new CosmosEventStore(
             _cosmosClient,
             options,
-            projector);
+            eventPublisher);
     }
 
     public async Task InitializeAsync()

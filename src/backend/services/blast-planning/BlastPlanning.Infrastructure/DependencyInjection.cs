@@ -1,9 +1,11 @@
 ﻿using BlastPlanning.Application.Abstractions.Clock;
 using BlastPlanning.Application.Abstractions.EventStore;
+using BlastPlanning.Application.Abstractions.Messaging;
 using BlastPlanning.Application.Abstractions.ReadModels;
 using BlastPlanning.Infrastructure.Clock;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
 using BlastPlanning.Infrastructure.EventStore.InMemory;
+using BlastPlanning.Infrastructure.Messaging;
 using BlastPlanning.Infrastructure.Persistence.Sql;
 using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using BlastPlanning.Infrastructure.Projections.InMemory;
@@ -57,6 +59,7 @@ public static class DependencyInjection
         }
 
         services.AddScoped<SqlConnectionFactory>();
+        services.AddScoped<IEventPublisher, InProcessEventPublisher>();
 
         return services;
     }

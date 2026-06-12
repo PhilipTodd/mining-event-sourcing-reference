@@ -1,4 +1,5 @@
 ﻿using BlastPlanning.Application.Abstractions.EventStore;
+using BlastPlanning.Application.Abstractions.Messaging;
 using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Infrastructure.Projections.BlastPlans;
@@ -14,12 +15,12 @@ public sealed class CosmosEventStore : IEventStore
 {
     private readonly CosmosContainer _container;
     private readonly CosmosEventSerializer _serializer = new();
-    private readonly BlastPlanProjector _projector;
+    private readonly IEventPublisher _eventPublisher;
 
     public CosmosEventStore(
         CosmosClient cosmosClient,
         IOptions<CosmosEventStoreOptions> options,
-        BlastPlanProjector projector)
+        IEventPublisher eventPublisher)
     {
         var value = options.Value;
 
@@ -27,7 +28,7 @@ public sealed class CosmosEventStore : IEventStore
             value.DatabaseName,
             value.ContainerName);
 
-        _projector = projector;
+        _eventPublisher = eventPublisher;
     }
 
     public async Task<IReadOnlyCollection<IDomainEvent>> LoadStreamAsync(
@@ -101,9 +102,9 @@ public sealed class CosmosEventStore : IEventStore
                 new PartitionKey(streamId),
                 cancellationToken: cancellationToken);
 
-            ///This is a temporary synchronous projection approach. Insert into SQL server immediately.
-            await _projector.ProjectAsync(
-                domainEvent,
+            await _eventPublisher.PublishAsync(
+                streamId,
+                events,
                 cancellationToken);
         }
     }

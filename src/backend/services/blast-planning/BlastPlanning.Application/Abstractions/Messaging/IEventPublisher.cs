@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using BlastPlanning.Domain.Events;
 
-namespace BlastPlanning.Application.Abstractions.Messaging
+namespace BlastPlanning.Application.Abstractions.Messaging;
+
+public interface IEventPublisher
 {
-    internal class IEventPublisher
-    {
-    }
+    Task PublishAsync(
+        string streamId,
+        IReadOnlyCollection<IDomainEvent> events,
+        CancellationToken cancellationToken = default);
 }
