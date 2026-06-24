@@ -1,15 +1,19 @@
-﻿using BlastPlanning.Application.Abstractions.Clock;
+﻿using Azure.Messaging.ServiceBus;
+using BlastPlanning.Application.Abstractions.Clock;
 using BlastPlanning.Application.Abstractions.EventStore;
 using BlastPlanning.Application.Abstractions.Messaging;
 using BlastPlanning.Application.Abstractions.ReadModels;
+
 using BlastPlanning.Infrastructure.Clock;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
 using BlastPlanning.Infrastructure.EventStore.InMemory;
 using BlastPlanning.Infrastructure.Messaging;
+using BlastPlanning.Infrastructure.Messaging.ServiceBus;
 using BlastPlanning.Infrastructure.Persistence.Sql;
 using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using BlastPlanning.Infrastructure.Projections.InMemory;
 using BlastPlanning.Infrastructure.Projections.Sql;
+
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,6 +31,9 @@ public static class DependencyInjection
 
         services.Configure<SqlOptions>(
             configuration.GetSection(SqlOptions.SectionName));
+
+        services.Configure<ServiceBusOptions>(
+            configuration.GetSection(ServiceBusOptions.SectionName));
 
         services.AddSingleton<IClock, SystemClock>();
 
@@ -59,7 +66,25 @@ public static class DependencyInjection
         }
 
         services.AddScoped<SqlConnectionFactory>();
-        services.AddScoped<IEventPublisher, InProcessEventPublisher>();
+
+
+        if (configuration.GetValue<bool>("UseInProcessEventPublisher"))
+        {
+            services.AddScoped<IEventPublisher, InProcessEventPublisher>();
+        }
+        else
+        {
+            services.AddSingleton(sp =>
+            {
+                var options = sp
+                    .GetRequiredService<Microsoft.Extensions.Options.IOptions<ServiceBusOptions>>()
+                    .Value;
+
+                return new ServiceBusClient(options.ConnectionString);
+            });
+
+            services.AddScoped<IEventPublisher, ServiceBusEventPublisher>();
+        }
 
         return services;
     }

@@ -51,8 +51,7 @@ public sealed class CosmosEventStoreTests : IAsyncLifetime
         var projector = new BlastPlanProjector(
             readRepository);
 
-        var eventPublisher = new InProcessEventPublisher(
-            projector);
+        var eventPublisher = new InProcessEventPublisher(projector);
 
         _eventStore = new CosmosEventStore(
             _cosmosClient,
