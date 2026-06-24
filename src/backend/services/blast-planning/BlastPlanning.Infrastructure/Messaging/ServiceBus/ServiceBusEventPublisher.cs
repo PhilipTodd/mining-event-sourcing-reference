@@ -1,6 +1,7 @@
 ﻿using Azure.Messaging.ServiceBus;
 using BlastPlanning.Application.Abstractions.Messaging;
 using BlastPlanning.Domain.Events;
+using BlastPlanning.Contracts.Messaging;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 
@@ -50,9 +51,3 @@ public sealed class ServiceBusEventPublisher(
     }
 }
 
-public sealed record ServiceBusEventEnvelope(
-    string StreamId,
-    string EventType,
-    int EventVersion,
-    DateTimeOffset OccurredUtc,
-    string Data);

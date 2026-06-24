@@ -2,6 +2,7 @@
 using Azure.Messaging.ServiceBus;
 using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using BlastPlanning.ProjectionWorker.Messaging;
+using BlastPlanning.Contracts.Messaging;
 
 namespace BlastPlanning.ProjectionWorker.Services;
 
