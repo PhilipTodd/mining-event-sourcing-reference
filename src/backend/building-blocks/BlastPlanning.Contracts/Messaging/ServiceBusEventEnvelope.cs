@@ -1,4 +1,4 @@
-﻿namespace BlastPlanning.ProjectionWorker.Messaging;
+﻿namespace BlastPlanning.Contracts.Messaging;
 
 public sealed record ServiceBusEventEnvelope(
     string StreamId,

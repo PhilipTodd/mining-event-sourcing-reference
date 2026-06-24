@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
+using BlastPlanning.Contracts.Messaging;
 
 namespace BlastPlanning.ProjectionWorker.Messaging;
 

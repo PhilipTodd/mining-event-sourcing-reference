@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\BlastPlanning.Application\BlastPlanning.Application.csproj" />
     <ProjectReference Include="..\BlastPlanning.Domain\BlastPlanning.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\BlastPlanning.Contracts\BlastPlanning.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
