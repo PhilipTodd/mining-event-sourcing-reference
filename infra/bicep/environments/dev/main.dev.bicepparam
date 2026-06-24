@@ -17,3 +17,7 @@ param sqlAdministratorLoginPassword = readEnvironmentVariable('SQL_ADMIN_PASSWOR
 param serviceBusNamespaceName = 'esr-dev-servicebus'
 param serviceBusTopicName = 'domain-events'
 param serviceBusSubscriptionName = 'blast-plan-projections'
+
+param logAnalyticsWorkspaceName = 'esr-dev-log'
+param applicationInsightsName = 'esr-dev-appi'
+
