@@ -8,6 +8,9 @@
     <Project Path="src/backend/services/blast-planning/BlastPlanning.Domain/BlastPlanning.Domain.csproj" />
     <Project Path="src/backend/services/blast-planning/BlastPlanning.Infrastructure/BlastPlanning.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/backend/workers/">
+    <Project Path="src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/BlastPlanning.Application.Tests/BlastPlanning.Application.Tests.csproj" />
     <Project Path="tests/BlastPlanning.Domain.Tests/BlastPlanning.Domain.Tests.csproj" />

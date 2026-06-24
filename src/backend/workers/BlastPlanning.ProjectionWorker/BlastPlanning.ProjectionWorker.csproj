@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-BlastPlanning.ProjectionWorker-e84fadc2-f5a6-4fab-967b-7f7fbe43758f</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\services\blast-planning\BlastPlanning.Application\BlastPlanning.Application.csproj" />
+    <ProjectReference Include="..\..\services\blast-planning\BlastPlanning.Domain\BlastPlanning.Domain.csproj" />
+    <ProjectReference Include="..\..\services\blast-planning\BlastPlanning.Infrastructure\BlastPlanning.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>
