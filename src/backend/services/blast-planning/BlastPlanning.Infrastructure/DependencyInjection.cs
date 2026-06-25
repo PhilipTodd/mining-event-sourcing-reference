@@ -17,6 +17,7 @@ using BlastPlanning.Infrastructure.Projections.Sql;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace BlastPlanning.Infrastructure;
 
@@ -31,9 +32,6 @@ public static class DependencyInjection
 
         services.Configure<SqlOptions>(
             configuration.GetSection(SqlOptions.SectionName));
-
-        services.Configure<ServiceBusOptions>(
-            configuration.GetSection(ServiceBusOptions.SectionName));
 
         services.AddSingleton<IClock, SystemClock>();
 
@@ -68,23 +66,26 @@ public static class DependencyInjection
         services.AddScoped<SqlConnectionFactory>();
 
 
-        if (configuration.GetValue<bool>("UseInProcessEventPublisher"))
+        services.Configure<ServiceBusOptions>(
+            configuration.GetSection(ServiceBusOptions.SectionName));
+
+        services.AddSingleton(sp =>
         {
-            services.AddScoped<IEventPublisher, InProcessEventPublisher>();
-        }
-        else
-        {
-            services.AddSingleton(sp =>
+            var options = sp
+                .GetRequiredService<IOptions<ServiceBusOptions>>()
+                .Value;
+
+            if (string.IsNullOrWhiteSpace(options.ConnectionString))
             {
-                var options = sp
-                    .GetRequiredService<Microsoft.Extensions.Options.IOptions<ServiceBusOptions>>()
-                    .Value;
+                throw new InvalidOperationException(
+                    "Service Bus connection string is not configured.");
+            }
 
-                return new ServiceBusClient(options.ConnectionString);
-            });
+            return new ServiceBusClient(options.ConnectionString);
+        });
 
-            services.AddScoped<IEventPublisher, ServiceBusEventPublisher>();
-        }
+        // Add this line near other service registrations, after ServiceBusClient registration or before 'return services;'
+        services.AddScoped<IEventPublisher, ServiceBusEventPublisher>();
 
         return services;
     }
