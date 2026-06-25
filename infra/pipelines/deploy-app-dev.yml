@@ -1,0 +1,123 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/**
+      - tests/**
+      - infra/pipelines/deploy-app-dev.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/**
+      - tests/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  buildConfiguration: 'Release'
+  azureServiceConnection: 'sc-esr-dev'
+
+  apiProject: 'src/backend/services/blast-planning/BlastPlanning.Api/BlastPlanning.Api.csproj'
+  workerProject: 'src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj'
+
+  apiAppName: 'esr-dev-api'
+  workerAppName: 'esr-dev-worker'
+
+  apiPackagePath: '$(Build.ArtifactStagingDirectory)/api'
+  workerPackagePath: '$(Build.ArtifactStagingDirectory)/worker'
+
+stages:
+  - stage: Build
+    displayName: 'Build and Test'
+    jobs:
+      - job: Build
+        displayName: 'Build, test, and publish'
+        steps:
+          - task: UseDotNet@2
+            displayName: 'Install .NET SDK'
+            inputs:
+              packageType: 'sdk'
+              version: '10.x'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Restore'
+            inputs:
+              command: 'restore'
+              projects: '**/*.sln'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Build'
+            inputs:
+              command: 'build'
+              projects: '**/*.sln'
+              arguments: '--configuration $(buildConfiguration) --no-restore'
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Run unit tests'
+            inputs:
+              command: 'test'
+              projects: |
+                tests/BlastPlanning.Domain.Tests/*.csproj
+                tests/BlastPlanning.Application.Tests/*.csproj
+              arguments: '--configuration $(buildConfiguration) --no-build --logger trx'
+              publishTestResults: true
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish API'
+            inputs:
+              command: 'publish'
+              publishWebProjects: false
+              projects: '$(apiProject)'
+              arguments: '--configuration $(buildConfiguration) --output $(apiPackagePath)'
+              zipAfterPublish: true
+
+          - task: DotNetCoreCLI@2
+            displayName: 'Publish Projection Worker'
+            inputs:
+              command: 'publish'
+              publishWebProjects: false
+              projects: '$(workerProject)'
+              arguments: '--configuration $(buildConfiguration) --output $(workerPackagePath)'
+              zipAfterPublish: true
+
+          - publish: '$(Build.ArtifactStagingDirectory)'
+            displayName: 'Publish pipeline artifact'
+            artifact: 'drop'
+
+  - stage: Deploy
+    displayName: 'Deploy to Dev'
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - deployment: DeployDevApps
+        displayName: 'Deploy API and Worker'
+        environment: 'esr-dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: 'drop'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy API'
+                  inputs:
+                    azureSubscription: '$(azureServiceConnection)'
+                    appType: 'webApp'
+                    appName: '$(apiAppName)'
+                    package: '$(Pipeline.Workspace)/drop/api/*.zip'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy Projection Worker'
+                  inputs:
+                    azureSubscription: '$(azureServiceConnection)'
+                    appType: 'webApp'
+                    appName: '$(workerAppName)'
+                    package: '$(Pipeline.Workspace)/drop/worker/*.zip'
