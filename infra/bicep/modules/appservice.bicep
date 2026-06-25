@@ -26,7 +26,6 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      netFrameworkVersion: 'v10.0'
       alwaysOn: true
       appSettings: [
         {
@@ -49,7 +48,6 @@ resource workerApp 'Microsoft.Web/sites@2023-12-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      netFrameworkVersion: 'v10.0'
       alwaysOn: true
       appSettings: [
         {
