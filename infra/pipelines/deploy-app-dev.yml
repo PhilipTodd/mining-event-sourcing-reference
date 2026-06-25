@@ -28,10 +28,6 @@ variables:
   workerProject: 'src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj'
 
   apiAppName: 'esr-dev-api'
-  workerAppName: 'esr-dev-worker'
-
-  apiPackagePath: '$(Build.ArtifactStagingDirectory)/api'
-  workerPackagePath: '$(Build.ArtifactStagingDirectory)/worker'
 
 stages:
   - stage: Build
@@ -75,8 +71,8 @@ stages:
               command: 'publish'
               publishWebProjects: false
               projects: '$(apiProject)'
-              arguments: '--configuration $(buildConfiguration) --output $(apiPackagePath)'
-              zipAfterPublish: true
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api-temp'
+              zipAfterPublish: false
 
           - task: DotNetCoreCLI@2
             displayName: 'Publish Projection Worker'
@@ -84,18 +80,18 @@ stages:
               command: 'publish'
               publishWebProjects: false
               projects: '$(workerProject)'
-              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/webjob-temp'
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/worker-temp'
               zipAfterPublish: false
 
           - script: |
-              mkdir -p $(Build.ArtifactStagingDirectory)/webjob/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker
-              cp -r $(Build.ArtifactStagingDirectory)/webjob-temp/* $(Build.ArtifactStagingDirectory)/webjob/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker/
-              cd $(Build.ArtifactStagingDirectory)/webjob
-              zip -r ../webjob.zip .
-            displayName: 'Package Projection Worker as continuous WebJob'
+              mkdir -p $(Build.ArtifactStagingDirectory)/api-temp/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker
+              cp -r $(Build.ArtifactStagingDirectory)/worker-temp/* $(Build.ArtifactStagingDirectory)/api-temp/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker/
+              cd $(Build.ArtifactStagingDirectory)/api-temp
+              zip -r ../api-with-webjob.zip .
+            displayName: 'Package API with continuous WebJob'
 
-          - publish: '$(Build.ArtifactStagingDirectory)'
-            displayName: 'Publish pipeline artifact'
+          - publish: '$(Build.ArtifactStagingDirectory)/api-with-webjob.zip'
+            displayName: 'Publish deployment artifact'
             artifact: 'drop'
 
   - stage: Deploy
@@ -104,7 +100,7 @@ stages:
     condition: succeeded()
     jobs:
       - deployment: DeployDevApps
-        displayName: 'Deploy API and Worker'
+        displayName: 'Deploy API with WebJob'
         environment: 'esr-dev'
         strategy:
           runOnce:
@@ -114,19 +110,10 @@ stages:
                   artifact: 'drop'
 
                 - task: AzureWebApp@1
-                  displayName: 'Deploy API'
+                  displayName: 'Deploy API with Projection Worker WebJob'
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
                     appType: 'webApp'
                     appName: '$(apiAppName)'
-                    package: '$(Pipeline.Workspace)/drop/api/*.zip'
-                    deploymentMethod: 'zipDeploy'
-
-                - task: AzureWebApp@1
-                  displayName: 'Deploy Projection Worker WebJob'
-                  inputs:
-                    azureSubscription: '$(azureServiceConnection)'
-                    appType: 'webApp'
-                    appName: '$(apiAppName)'
-                    package: '$(Pipeline.Workspace)/drop/webjob.zip'
+                    package: '$(Pipeline.Workspace)/drop/api-with-webjob.zip'
                     deploymentMethod: 'zipDeploy'
