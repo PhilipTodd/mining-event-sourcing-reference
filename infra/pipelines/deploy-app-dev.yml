@@ -73,6 +73,7 @@ stages:
               projects: '$(apiProject)'
               arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api-temp'
               zipAfterPublish: false
+              modifyOutputPath: false
 
           - task: DotNetCoreCLI@2
             displayName: 'Publish Projection Worker'
@@ -82,6 +83,15 @@ stages:
               projects: '$(workerProject)'
               arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/worker-temp'
               zipAfterPublish: false
+              modifyOutputPath: false
+
+          - script: |
+              echo "API publish output:"
+              find $(Build.ArtifactStagingDirectory)/api-temp -maxdepth 2 -type f | sort
+
+              echo "Worker publish output:"
+              find $(Build.ArtifactStagingDirectory)/worker-temp -maxdepth 2 -type f | sort
+            displayName: 'Inspect publish output'
 
           - script: |
               mkdir -p $(Build.ArtifactStagingDirectory)/api-temp/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker
