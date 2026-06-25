@@ -17,6 +17,12 @@ public sealed class Worker(
     {
         var options = serviceBusOptions.Value;
 
+        logger.LogInformation(
+            "Service Bus config loaded. Topic={TopicName}, Subscription={SubscriptionName}, HasConnectionString={HasConnectionString}",
+            options.TopicName,
+            options.SubscriptionName,
+            !string.IsNullOrWhiteSpace(options.ConnectionString));
+
         _processor = serviceBusClient.CreateProcessor(
             options.TopicName,
             options.SubscriptionName,
