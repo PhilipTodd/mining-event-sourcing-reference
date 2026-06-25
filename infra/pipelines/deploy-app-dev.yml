@@ -84,8 +84,15 @@ stages:
               command: 'publish'
               publishWebProjects: false
               projects: '$(workerProject)'
-              arguments: '--configuration $(buildConfiguration) --output $(workerPackagePath)'
-              zipAfterPublish: true
+              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/webjob-temp'
+              zipAfterPublish: false
+
+          - script: |
+              mkdir -p $(Build.ArtifactStagingDirectory)/webjob/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker
+              cp -r $(Build.ArtifactStagingDirectory)/webjob-temp/* $(Build.ArtifactStagingDirectory)/webjob/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker/
+              cd $(Build.ArtifactStagingDirectory)/webjob
+              zip -r ../webjob.zip .
+            displayName: 'Package Projection Worker as continuous WebJob'
 
           - publish: '$(Build.ArtifactStagingDirectory)'
             displayName: 'Publish pipeline artifact'
@@ -115,9 +122,9 @@ stages:
                     package: '$(Pipeline.Workspace)/drop/api/*.zip'
 
                 - task: AzureWebApp@1
-                  displayName: 'Deploy Projection Worker'
+                  displayName: 'Deploy Projection Worker WebJob'
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
                     appType: 'webApp'
-                    appName: '$(workerAppName)'
-                    package: '$(Pipeline.Workspace)/drop/worker/*.zip'
+                    appName: '$(apiAppName)'
+                    package: '$(Pipeline.Workspace)/drop/webjob.zip'
