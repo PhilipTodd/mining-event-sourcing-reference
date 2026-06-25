@@ -24,6 +24,10 @@ param serviceBusNamespaceName string
 param serviceBusTopicName string = 'domain-events'
 param serviceBusSubscriptionName string = 'blast-plan-projections'
 
+param appServicePlanName string
+param apiAppName string
+param workerAppName string
+
 module cosmos '../../modules/cosmosdb.bicep' = {
   name: 'cosmos-${projectName}-${environmentName}'
   params: {
@@ -65,6 +69,17 @@ module monitoring '../../modules/applicationinsights.bicep' = {
   }
 }
 
+module appService '../../modules/appservice.bicep' = {
+  name: 'appservice-${projectName}-${environmentName}'
+  params: {
+    location: location
+    appServicePlanName: appServicePlanName
+    apiAppName: apiAppName
+    workerAppName: workerAppName
+    applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
+  }
+}
+
 output cosmosAccountName string = cosmos.outputs.accountName
 output cosmosDatabaseName string = cosmos.outputs.databaseName
 output cosmosContainerName string = cosmos.outputs.containerName
@@ -81,3 +96,8 @@ output logAnalyticsWorkspaceName string = monitoring.outputs.logAnalyticsWorkspa
 output applicationInsightsName string = monitoring.outputs.applicationInsightsName
 output applicationInsightsConnectionString string = monitoring.outputs.applicationInsightsConnectionString
 
+output appServicePlanName string = appService.outputs.appServicePlanName
+output apiAppName string = appService.outputs.apiAppName
+output workerAppName string = appService.outputs.workerAppName
+output apiAppDefaultHostName string = appService.outputs.apiAppDefaultHostName
+output workerAppDefaultHostName string = appService.outputs.workerAppDefaultHostName

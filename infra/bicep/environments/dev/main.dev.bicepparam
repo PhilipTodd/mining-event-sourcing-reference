@@ -21,3 +21,6 @@ param serviceBusSubscriptionName = 'blast-plan-projections'
 param logAnalyticsWorkspaceName = 'esr-dev-log'
 param applicationInsightsName = 'esr-dev-appi'
 
+param appServicePlanName = 'esr-dev-plan'
+param apiAppName = 'esr-dev-api'
+param workerAppName = 'esr-dev-worker'
