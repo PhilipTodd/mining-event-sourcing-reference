@@ -10,6 +10,7 @@ builder.Services.AddHostedService<Worker>();
 builder.Services.AddSingleton<EventDeserializer>();
 builder.Services.AddScoped<ProjectionProcessor>();
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplicationInsightsTelemetryWorkerService();
 //builder.Services.AddSingleton<ServiceBusClient>(...);
 
 var host = builder.Build();

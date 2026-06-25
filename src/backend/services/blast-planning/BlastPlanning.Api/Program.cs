@@ -24,6 +24,10 @@ builder.Services.AddSwaggerGen();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Add observability services
+builder.Services.AddApplicationInsightsTelemetry();
+builder.Services.AddHealthChecks(); 
+
 var app = builder.Build();
 
 
@@ -36,6 +40,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapHealthChecks("/health");
 
 // Exception handling at top level to ensure meaningful response to clients
 app.UseExceptionHandler(errorApp =>
