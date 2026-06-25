@@ -120,6 +120,7 @@ stages:
                     appType: 'webApp'
                     appName: '$(apiAppName)'
                     package: '$(Pipeline.Workspace)/drop/api/*.zip'
+                    deploymentMethod: 'zipDeploy'
 
                 - task: AzureWebApp@1
                   displayName: 'Deploy Projection Worker WebJob'
@@ -128,3 +129,4 @@ stages:
                     appType: 'webApp'
                     appName: '$(apiAppName)'
                     package: '$(Pipeline.Workspace)/drop/webjob.zip'
+                    deploymentMethod: 'zipDeploy'
