@@ -14,6 +14,9 @@ param sqlServerName string
 param sqlDatabaseName string
 param sqlAdministratorLogin string
 
+param logAnalyticsWorkspaceName string
+param applicationInsightsName string
+
 @secure()
 param sqlAdministratorLoginPassword string
 
@@ -53,6 +56,15 @@ module serviceBus '../../modules/servicebus.bicep' = {
   }
 }
 
+module monitoring '../../modules/applicationinsights.bicep' = {
+  name: 'monitoring-${projectName}-${environmentName}'
+  params: {
+    location: location
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+    applicationInsightsName: applicationInsightsName
+  }
+}
+
 output cosmosAccountName string = cosmos.outputs.accountName
 output cosmosDatabaseName string = cosmos.outputs.databaseName
 output cosmosContainerName string = cosmos.outputs.containerName
@@ -64,3 +76,8 @@ output sqlServerFullyQualifiedDomainName string = sql.outputs.sqlServerFullyQual
 output serviceBusNamespaceName string = serviceBus.outputs.namespaceName
 output serviceBusTopicName string = serviceBus.outputs.topicName
 output serviceBusSubscriptionName string = serviceBus.outputs.subscriptionName
+
+output logAnalyticsWorkspaceName string = monitoring.outputs.logAnalyticsWorkspaceName
+output applicationInsightsName string = monitoring.outputs.applicationInsightsName
+output applicationInsightsConnectionString string = monitoring.outputs.applicationInsightsConnectionString
+
