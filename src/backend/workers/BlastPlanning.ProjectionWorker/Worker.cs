@@ -35,6 +35,15 @@ public sealed class Worker(
             options.SubscriptionName);
 
         await _processor.StartProcessingAsync(stoppingToken);
+
+        try
+        {
+            await Task.Delay(Timeout.Infinite, stoppingToken);
+        }
+        catch (OperationCanceledException)
+        {
+            logger.LogInformation("Projection worker cancellation requested.");
+        }
     }
 
     private async Task ProcessMessageAsync(ProcessMessageEventArgs args)
@@ -73,9 +82,10 @@ public sealed class Worker(
     {
         logger.LogError(
             args.Exception,
-            "Service Bus processing error. Entity: {EntityPath}, Source: {ErrorSource}",
+            "Service Bus processing error. Entity: {EntityPath}, Source: {ErrorSource}, Namespace: {FullyQualifiedNamespace}",
             args.EntityPath,
-            args.ErrorSource);
+            args.ErrorSource,
+            args.FullyQualifiedNamespace);
 
         return Task.CompletedTask;
     }
