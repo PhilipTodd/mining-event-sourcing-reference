@@ -147,7 +147,7 @@ Benefits include:
 - multi-region support,
 - SLA-backed availability.
 
-This aligns with the project’s Azure-native deployment goals.
+This aligns with the projectâ€™s Azure-native deployment goals.
 
 ---
 

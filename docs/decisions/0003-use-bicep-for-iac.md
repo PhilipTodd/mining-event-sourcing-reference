@@ -85,13 +85,13 @@ The platform will not rely on manual Azure Portal provisioning for managed envir
 
 # Rationale
 
-Bicep was selected because it aligns strongly with the project’s Azure-native architecture and operational goals.
+Bicep was selected because it aligns strongly with the projectâ€™s Azure-native architecture and operational goals.
 
 ---
 
 ## Azure-Native IaC
 
-Bicep is Microsoft’s recommended Infrastructure as Code language for Azure resource deployment.
+Bicep is Microsoftâ€™s recommended Infrastructure as Code language for Azure resource deployment.
 
 It provides:
 
@@ -100,7 +100,7 @@ It provides:
 - strong tooling support,
 - simplified Azure resource modelling.
 
-This aligns directly with the platform’s Azure-centric architecture.
+This aligns directly with the platformâ€™s Azure-centric architecture.
 
 ---
 
