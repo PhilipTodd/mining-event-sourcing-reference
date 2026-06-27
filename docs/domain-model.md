@@ -58,13 +58,13 @@ The aggregate is responsible for enforcing all business rules associated with pl
 
 ```text
 BlastPlan
-?
-??? Identity
-??? Status
-??? Blast Pattern
-??? Charge Design
-??? Approval Information
-??? Event History
+│
+├── Identity
+├── Status
+├── Blast Pattern
+├── Charge Design
+├── Approval Information
+└── Event History
 ```
 
 The aggregate represents the transactional consistency boundary.
@@ -90,27 +90,27 @@ The BlastPlan aggregate is responsible for:
 ```text
 Draft
 
-   ?
+   │
 
-   ?
+   ▼
 
 Designed
 
-   ?
+   │
 
-   ?
+   ▼
 
 Approved
 
-   ?
+   │
 
-   ?
+   ▼
 
 Executed
 
-   ?
+   │
 
-   ?
+   ▼
 
 Completed
 ```
@@ -160,19 +160,19 @@ Each aggregate maintains an ordered event stream.
 ```text
 BlastPlanCreated
 
-        ?
+        │
 
 BlastPatternUpdated
 
-        ?
+        │
 
 ChargeDesignCompleted
 
-        ?
+        │
 
 BlastApproved
 
-        ?
+        │
 
 BlastExecuted
 ```
@@ -298,37 +298,37 @@ This separation allows the internal domain model to evolve independently from ex
 ```text
 Commands
 
-      ?
+      │
 
-      ?
+      ▼
 
 Aggregate
 
-      ?
+      │
 
 Business Rules
 
-      ?
+      │
 
-      ?
+      ▼
 
 Domain Events
 
-      ?
+      │
 
-      ?
+      ▼
 
 Cosmos DB Event Store
 
-      ?
+      │
 
-      ?
+      ▼
 
 Projection Workers
 
-      ?
+      │
 
-      ?
+      ▼
 
 Azure SQL Read Models
 ```

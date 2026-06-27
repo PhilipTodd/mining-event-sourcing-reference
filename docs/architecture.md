@@ -78,34 +78,34 @@ A typical command follows the sequence below.
 
 ```text
                 Angular Web Application
-                         ?
-                         ?
+                         │
+                         ▼
                ASP.NET Core Web API
-                         ?
+                         │
                 Command Handlers
-                         ?
-                         ?
+                         │
+                         ▼
                   Domain Aggregate
-                         ?
+                         │
                   Domain Events
-                         ?
-                         ?
+                         │
+                         ▼
                Azure Cosmos DB
                   Event Store
-                         ?
-                         ?
+                         │
+                         ▼
                 Azure Event Hubs
-                         ?
+                         │
               Projection Workers
-                         ?
-                         ?
+                         │
+                         ▼
                Azure SQL Database
                   Read Models
-                         ?
-                         ?
+                         │
+                         ▼
                   Query Handlers
-                         ?
-                         ?
+                         │
+                         ▼
                  Angular Web UI
 ```
 
@@ -156,18 +156,18 @@ Azure Event Hubs distributes committed events to downstream consumers without ti
 
 ```text
 src/
-??? Api/
-??? Application/
-??? Domain/
-??? Infrastructure/
-??? ProjectionWorker/
+├── Api/
+├── Application/
+├── Domain/
+├── Infrastructure/
+└── ProjectionWorker/
 
 infra/
-??? bicep/
+├── bicep/
 
 tests/
-??? UnitTests/
-??? IntegrationTests/
+├── UnitTests/
+└── IntegrationTests/
 ```
 
 ---

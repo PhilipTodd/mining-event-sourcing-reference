@@ -35,7 +35,7 @@ A production-style reference implementation demonstrating:
 
 ## Source Code
 
-GitHub Repository
+[GitHub Repository](https://github.com/philiptodd/azure-distributed-systems-reference){:target="_blank"}
 
 ---
 

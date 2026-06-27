@@ -71,13 +71,13 @@ Example deployment structure:
 ```text
 infra/
 
-??? main.bicep
-??? appservice.bicep
-??? cosmosdb.bicep
-??? sql.bicep
-??? eventhubs.bicep
-??? storage.bicep
-??? appinsights.bicep
+├── main.bicep
+├── appservice.bicep
+├── cosmosdb.bicep
+├── sql.bicep
+├── eventhubs.bicep
+├── storage.bicep
+└── appinsights.bicep
 ```
 
 ---
@@ -107,45 +107,45 @@ Typical deployment flow:
 ```text
 Git Commit
 
-      ?
+      │
 
-      ?
+      ▼
 
 Azure DevOps
 
-      ?
+      │
 
-      ?
+      ▼
 
 Build
 
-      ?
+      │
 
-      ?
+      ▼
 
 Unit Tests
 
-      ?
+      │
 
-      ?
+      ▼
 
 Publish Artefacts
 
-      ?
+      │
 
-      ?
+      ▼
 
 Provision Infrastructure
 
-      ?
+      │
 
-      ?
+      ▼
 
 Deploy Application
 
-      ?
+      │
 
-      ?
+      ▼
 
 Health Checks
 ```

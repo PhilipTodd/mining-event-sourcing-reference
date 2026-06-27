@@ -80,28 +80,28 @@ A typical command follows the sequence below.
 
 ```text
 Command
-    ?
-    ?
+    │
+    ▼
 Command Handler
-    ?
-    ?
+    │
+    ▼
 Aggregate
-    ?
+    │
 Business Rules
-    ?
-    ?
+    │
+    ▼
 Domain Events
-    ?
-    ?
+    │
+    ▼
 Cosmos DB Event Store
-    ?
-    ?
+    │
+    ▼
 Azure Event Hubs
-    ?
-    ?
+    │
+    ▼
 Projection Workers
-    ?
-    ?
+    │
+    ▼
 Azure SQL Read Models
 ```
 
@@ -117,12 +117,12 @@ Example:
 
 ```text
 BlastPlan
-?
-??? Event 1
-??? Event 2
-??? Event 3
-??? Event 4
-??? Event 5
+│
+├── Event 1
+├── Event 2
+├── Event 3
+├── Event 4
+└── Event 5
 ```
 
 No event is ever updated or deleted.
@@ -144,17 +144,17 @@ When processing a command:
 
 ```text
 Load Events
-      ?
-      ?
+      │
+      ▼
 Replay Events
-      ?
-      ?
+      │
+      ▼
 Current Aggregate
-      ?
-      ?
+      │
+      ▼
 Execute Command
-      ?
-      ?
+      │
+      ▼
 New Events
 ```
 
@@ -193,13 +193,13 @@ One of the major advantages of Event Sourcing is the ability to rebuild read mod
 
 ```text
 Event Store
-      ?
+      │
 Replay Events
-      ?
-      ?
+      │
+      ▼
 Projection Worker
-      ?
-      ?
+      │
+      ▼
 Azure SQL
 ```
 
