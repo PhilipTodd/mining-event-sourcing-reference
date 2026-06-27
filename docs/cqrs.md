@@ -37,34 +37,34 @@ CQRS addresses these issues by separating write operations from read operations.
 ```text
                     User
 
-                     ?
-        ???????????????????????????
-        ?                         ?
-        ?                         ?
+                     │
+        ┌────────────┴────────────┐
+        │                         │
+        ▼                         ▼
 
    Commands                  Queries
 
-        ?                         ?
+        │                         │
 
-        ?                         ?
+        ▼                         ▼
 
 Command Handlers           Query Handlers
 
-        ?                         ?
+        │                         │
 
-        ?                         ?
+        ▼                         ▼
 
  Domain Aggregate         Azure SQL Read Model
 
-        ?                         ?
+        │                         │
 
-        ?                         ?
+        ▼                         ▼
 
    Domain Events          Read DTOs
 
-        ?
+        │
 
-        ?
+        ▼
 
  Azure Cosmos DB
     Event Store
@@ -104,39 +104,39 @@ Typical response:
 ```text
 HTTP Request
 
-      ?
+      │
 
-      ?
+      ▼
 
 Command DTO
 
-      ?
+      │
 
-      ?
+      ▼
 
 Command Handler
 
-      ?
+      │
 
-      ?
+      ▼
 
 Load Aggregate
 
-      ?
+      │
 
-      ?
+      ▼
 
 Business Rules
 
-      ?
+      │
 
-      ?
+      ▼
 
 Domain Events
 
-      ?
+      │
 
-      ?
+      ▼
 
 Persist Events
 ```
@@ -169,27 +169,27 @@ This allows:
 ```text
 HTTP Request
 
-      ?
+      │
 
-      ?
+      ▼
 
 Query DTO
 
-      ?
+      │
 
-      ?
+      ▼
 
 Query Handler
 
-      ?
+      │
 
-      ?
+      ▼
 
 Azure SQL
 
-      ?
+      │
 
-      ?
+      ▼
 
 Response DTO
 ```
@@ -222,33 +222,33 @@ The sequence is:
 ```text
 Command
 
-    ?
+    │
 
-    ?
+    ▼
 
 Event Store
 
-    ?
+    │
 
-    ?
+    ▼
 
 Event Hubs
 
-    ?
+    │
 
-    ?
+    ▼
 
 Projection Worker
 
-    ?
+    │
 
-    ?
+    ▼
 
 Azure SQL
 
-    ?
+    │
 
-    ?
+    ▼
 
 Query
 ```
