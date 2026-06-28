@@ -4,10 +4,6 @@ title: Home
 permalink: /
 ---
 
----
-title: Event Sourcing Reference Platform
----
-
 # Event Sourcing Reference Platform
 
 A production-style reference implementation demonstrating:
