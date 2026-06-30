@@ -1,11 +1,13 @@
 using BlastPlanning.Application.BlastPlans.Commands.ApproveBlastPlan;
 using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
-using BlastPlanning.Infrastructure;
-using MediatR;
 using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Exceptions;
+using BlastPlanning.Infrastructure;
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Identity.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,10 +28,17 @@ builder.Services.AddOpenApi();
 
 // Add observability services
 builder.Services.AddApplicationInsightsTelemetry();
-builder.Services.AddHealthChecks(); 
+builder.Services.AddHealthChecks();
+
+// Add authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -114,7 +123,7 @@ app.MapPost("/blast-plans", async (
     return Results.Created(
         $"/blast-plans/{result.BlastPlanId}",
         result);
-});
+}).RequireAuthorization();
 
 // Approve a blast plan
 app.MapPost("/blast-plans/{id:guid}/approve", async (
@@ -128,7 +137,7 @@ app.MapPost("/blast-plans/{id:guid}/approve", async (
         cancellationToken);
 
     return Results.NoContent();
-});
+}).RequireAuthorization();
 
 // Get a blast plan summary
 app.MapGet("/blast-plans/{id:guid}", async (
