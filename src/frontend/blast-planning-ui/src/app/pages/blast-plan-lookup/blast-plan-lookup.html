@@ -1,1 +1,31 @@
-<p>blast-plan-lookup works!</p>
+<section class="page">
+  <header class="page-header">
+    <h1>Blast Plan Lookup</h1>
+    <p>Open a projected read model by Blast Plan ID.</p>
+  </header>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Find Blast Plan</mat-card-title>
+      <mat-card-subtitle>Reads from the Azure SQL projection via the query API</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="form" (ngSubmit)="search()" class="form">
+        <mat-form-field appearance="outline">
+          <mat-label>Blast Plan ID</mat-label>
+          <input matInput formControlName="blastPlanId" placeholder="Paste BlastPlanId" />
+          <mat-error *ngIf="form.controls.blastPlanId.hasError('required')">
+            Blast Plan ID is required
+          </mat-error>
+        </mat-form-field>
+
+        <div class="actions">
+          <button mat-raised-button color="primary" type="submit">
+            Search
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</section>
