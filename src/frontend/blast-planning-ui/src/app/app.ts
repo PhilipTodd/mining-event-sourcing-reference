@@ -1,12 +1,10 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { AppShell } from './layout/app-shell/app-shell';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
+  imports: [AppShell],
+  template: '<app-app-shell />',
   styleUrl: './app.scss'
 })
-export class App {
-  protected readonly title = signal('blast-planning-ui');
-}
+export class App { }

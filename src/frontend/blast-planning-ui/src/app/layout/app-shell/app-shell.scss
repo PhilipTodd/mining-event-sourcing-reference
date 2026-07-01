@@ -1,0 +1,41 @@
+.topbar {
+  height: 64px;
+  padding: 0 24px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.subtitle {
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+.shell {
+  height: calc(100vh - 64px);
+}
+
+.sidenav {
+  width: 260px;
+  padding-top: 12px;
+}
+
+.content {
+  padding: 32px;
+}
+
+mat-icon {
+  margin-right: 12px;
+}
+
+.active {
+  font-weight: 600;
+}
