@@ -1,0 +1,87 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/frontend/blast-planning-ui/**
+      - infra/pipelines/deploy-ui-dev.yml
+
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - src/frontend/blast-planning-ui/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  azureServiceConnection: 'sc-esr-dev'
+  uiAppName: 'esr-dev-ui'
+  uiProjectRoot: 'src/frontend/blast-planning-ui'
+  nodeVersion: '22.x'
+
+stages:
+  - stage: Build
+    displayName: 'Build Angular UI'
+    jobs:
+      - job: Build
+        displayName: 'Install, test, and build'
+        steps:
+          - task: NodeTool@0
+            displayName: 'Install Node.js'
+            inputs:
+              versionSpec: '$(nodeVersion)'
+
+          - script: |
+              npm ci
+            displayName: 'Install dependencies'
+            workingDirectory: '$(uiProjectRoot)'
+
+          - script: |
+              npm run build
+            displayName: 'Build Angular app'
+            workingDirectory: '$(uiProjectRoot)'
+
+          - script: |
+              echo "Inspect dist output"
+              find $(uiProjectRoot)/dist -maxdepth 3 -type f | sort
+            displayName: 'Inspect build output'
+
+          - script: |
+              mkdir -p $(Build.ArtifactStagingDirectory)/ui
+              cp -r $(uiProjectRoot)/dist/blast-planning-ui/browser/* $(Build.ArtifactStagingDirectory)/ui/
+              cd $(Build.ArtifactStagingDirectory)/ui
+              zip -r ../ui.zip .
+            displayName: 'Package UI'
+
+          - publish: '$(Build.ArtifactStagingDirectory)/ui.zip'
+            displayName: 'Publish UI artifact'
+            artifact: 'drop'
+
+  - stage: Deploy
+    displayName: 'Deploy UI to Dev'
+    dependsOn: Build
+    condition: succeeded()
+    jobs:
+      - deployment: DeployDevUi
+        displayName: 'Deploy Angular UI'
+        environment: 'esr-dev'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - download: current
+                  artifact: 'drop'
+
+                - task: AzureWebApp@1
+                  displayName: 'Deploy UI App Service'
+                  inputs:
+                    azureSubscription: '$(azureServiceConnection)'
+                    appType: 'webApp'
+                    appName: '$(uiAppName)'
+                    package: '$(Pipeline.Workspace)/drop/ui.zip'
+                    deploymentMethod: 'runFromPackage'
