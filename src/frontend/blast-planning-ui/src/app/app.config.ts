@@ -46,7 +46,7 @@ export const appConfig: ApplicationConfig = {
           auth: {
             clientId: environment.entra.clientId,
             authority: `https://login.microsoftonline.com/${environment.entra.tenantId}`,
-            redirectUri: 'http://localhost:4200/'
+            redirectUri: environment.entra.redirectUri
           },
           cache: {
             cacheLocation: BrowserCacheLocation.LocalStorage
