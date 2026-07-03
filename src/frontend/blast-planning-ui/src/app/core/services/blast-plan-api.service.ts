@@ -1,6 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 
+import { environment } from '../../../environments/environment';
+
 import {
   ApproveBlastPlanRequest,
   BlastPlanSummary,
@@ -12,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class BlastPlanApiService {
-  private readonly baseUrl = 'https://localhost:7221';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   constructor(private readonly http: HttpClient) { }
 
