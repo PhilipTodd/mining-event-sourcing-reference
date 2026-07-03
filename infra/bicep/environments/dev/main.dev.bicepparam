@@ -23,4 +23,5 @@ param applicationInsightsName = 'esr-dev-appi'
 
 param appServicePlanName = 'esr-dev-plan'
 param apiAppName = 'esr-dev-api'
+param uiAppName = 'esr-dev-ui'
 param workerAppName = 'esr-dev-worker'

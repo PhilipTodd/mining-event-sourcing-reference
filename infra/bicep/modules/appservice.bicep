@@ -1,6 +1,7 @@
 param location string
 param appServicePlanName string
 param apiAppName string
+param uiAppName string
 param workerAppName string
 param applicationInsightsConnectionString string
 
@@ -27,6 +28,7 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
     httpsOnly: true
     siteConfig: {
       alwaysOn: true
+      minTlsVersion: '1.2'
       appSettings: [
         {
           name: 'ASPNETCORE_ENVIRONMENT'
@@ -35,6 +37,33 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
         {
           name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
           value: applicationInsightsConnectionString
+        }
+      ]
+    }
+  }
+}
+
+resource uiApp 'Microsoft.Web/sites@2023-12-01' = {
+  name: uiAppName
+  location: location
+  properties: {
+    serverFarmId: appServicePlan.id
+    httpsOnly: true
+    siteConfig: {
+      alwaysOn: true
+      minTlsVersion: '1.2'
+      appSettings: [
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
+        {
+          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
+          value: 'false'
+        }
+        {
+          name: 'WEBSITE_NODE_DEFAULT_VERSION'
+          value: '~22'
         }
       ]
     }
@@ -65,6 +94,7 @@ resource workerApp 'Microsoft.Web/sites@2023-12-01' = {
 
 output appServicePlanName string = appServicePlan.name
 output apiAppName string = apiApp.name
+output uiAppName string = uiApp.name
 output workerAppName string = workerApp.name
 output apiAppDefaultHostName string = apiApp.properties.defaultHostName
 output workerAppDefaultHostName string = workerApp.properties.defaultHostName
