@@ -13,12 +13,11 @@ param cosmosThroughput int = 400
 param sqlServerName string
 param sqlDatabaseName string
 param sqlAdministratorLogin string
+@secure()
+param sqlAdministratorLoginPassword string
 
 param logAnalyticsWorkspaceName string
 param applicationInsightsName string
-
-@secure()
-param sqlAdministratorLoginPassword string
 
 param serviceBusNamespaceName string
 param serviceBusTopicName string = 'domain-events'
@@ -28,6 +27,15 @@ param appServicePlanName string
 param apiAppName string
 param workerAppName string
 param uiAppName string
+@secure()
+param cosmosConnectionString string
+@secure()
+param sqlConnectionString string
+@secure()
+param serviceBusConnectionString string
+
+param entraTenantId string
+param entraApiClientId string
 
 module cosmos '../../modules/cosmosdb.bicep' = {
   name: 'cosmos-${projectName}-${environmentName}'
@@ -79,6 +87,19 @@ module appService '../../modules/appservice.bicep' = {
     uiAppName: uiAppName
     workerAppName: workerAppName
     applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
+
+    cosmosDatabaseName: cosmosDatabaseName
+    cosmosContainerName: cosmosContainerName
+    cosmosConnectionString: cosmosConnectionString
+
+    sqlConnectionString: sqlConnectionString
+
+    serviceBusConnectionString: serviceBusConnectionString
+    serviceBusTopicName: serviceBusTopicName
+    serviceBusSubscriptionName: serviceBusSubscriptionName
+
+    entraTenantId: entraTenantId
+    entraApiClientId: entraApiClientId
   }
 }
 

@@ -5,6 +5,24 @@ param uiAppName string
 param workerAppName string
 param applicationInsightsConnectionString string
 
+param cosmosDatabaseName string
+param cosmosContainerName string
+
+@secure()
+param cosmosConnectionString string
+
+@secure()
+param sqlConnectionString string
+
+@secure()
+param serviceBusConnectionString string
+
+param serviceBusTopicName string
+param serviceBusSubscriptionName string
+
+param entraTenantId string
+param entraApiClientId string
+
 param skuName string = 'B1'
 param skuTier string = 'Basic'
 
@@ -29,16 +47,82 @@ resource apiApp 'Microsoft.Web/sites@2023-12-01' = {
     siteConfig: {
       alwaysOn: true
       minTlsVersion: '1.2'
-      appSettings: [
-        {
-          name: 'ASPNETCORE_ENVIRONMENT'
-          value: 'Development'
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: applicationInsightsConnectionString
-        }
-      ]
+        appSettings: [
+          {
+            name: 'ASPNETCORE_ENVIRONMENT'
+            value: 'Development'
+          }
+          {
+            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+            value: applicationInsightsConnectionString
+          }
+
+          {
+            name: 'UseInMemoryEventStore'
+            value: 'false'
+          }
+          {
+            name: 'UseInMemoryReadModels'
+            value: 'false'
+          }
+
+          {
+            name: 'CosmosEventStore__ConnectionString'
+            value: cosmosConnectionString
+          }
+          {
+            name: 'CosmosEventStore__DatabaseName'
+            value: cosmosDatabaseName
+          }
+          {
+            name: 'CosmosEventStore__ContainerName'
+            value: cosmosContainerName
+          }
+
+          {
+            name: 'Sql__ConnectionString'
+            value: sqlConnectionString
+          }
+
+          {
+            name: 'ServiceBus__ConnectionString'
+            value: serviceBusConnectionString
+          }
+          {
+            name: 'ServiceBus__TopicName'
+            value: serviceBusTopicName
+          }
+          {
+            name: 'ServiceBus__SubscriptionName'
+            value: serviceBusSubscriptionName
+          }
+
+          {
+            name: 'AzureAd__Instance'
+            value: 'https://login.microsoftonline.com/'
+          }
+          {
+            name: 'AzureAd__TenantId'
+            value: entraTenantId
+          }
+          {
+            name: 'AzureAd__ClientId'
+            value: entraApiClientId
+          }
+          {
+            name: 'AzureAd__Audience'
+            value: 'api://${entraApiClientId}'
+          }
+
+          {
+            name: 'Cors__AllowedOrigins__0'
+            value: 'http://localhost:4200'
+          }
+          {
+            name: 'Cors__AllowedOrigins__1'
+            value: 'https://demo.event-sourcing.ausdatatech.com.au'
+          }
+        ]
     }
   }
 }

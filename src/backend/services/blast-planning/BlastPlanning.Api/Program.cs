@@ -54,7 +54,7 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-app.UseCors("AngularDev");
+app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
