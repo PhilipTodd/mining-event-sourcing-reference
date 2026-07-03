@@ -1,12 +1,6 @@
 trigger: none
 
-pr:
-  branches:
-    include:
-      - main
-  paths:
-    include:
-      - infra/bicep/**
+pr: none
 
 pool:
   vmImage: 'ubuntu-latest'
