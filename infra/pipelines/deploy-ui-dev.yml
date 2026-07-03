@@ -9,7 +9,7 @@ variables:
   azureServiceConnection: 'sc-esr-dev'
   uiAppName: 'esr-dev-ui'
   uiProjectRoot: 'src/frontend/blast-planning-ui'
-  nodeVersion: '22.x'
+  nodeVersion: '24.x'
 
 stages:
   - stage: Build
