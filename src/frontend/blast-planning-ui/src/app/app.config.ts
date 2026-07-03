@@ -28,7 +28,7 @@ import {
 } from '@azure/msal-browser';
 
 import { routes } from './app.routes';
-import { environment } from '../environments/environment.development';
+import { environment } from '../environments/environment';
 export function initializeMsal(msalService: MsalService): () => Promise<void> {
   return () => msalService.instance.initialize();
 }
@@ -60,33 +60,33 @@ export const appConfig: ApplicationConfig = {
         },
         {
           interactionType: InteractionType.Redirect,
+
           protectedResourceMap: new Map([
             [
-              'https://localhost:7221/blast-plans',
-              ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
+              `${environment.apiBaseUrl}/blast-plans`,
+              [environment.entra.apiScope]
             ],
             [
-              'https://localhost:7221/blast-plans/',
-              ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
+              `${environment.apiBaseUrl}/blast-plans/`,
+              [environment.entra.apiScope]
             ],
             [
-              'https://localhost:7221/blast-plans/*/approve',
-              ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
+              `${environment.apiBaseUrl}/blast-plans/*/approve`,
+              [environment.entra.apiScope]
             ]
           ])
+
           // protectedResourceMap: new Map([
           //   [
-          //     'https://localhost:7221',
-          //     ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
-          //   ]
-          // ])
-          // protectedResourceMap: new Map([
-          //   [
-          //     'https://localhost:7221',
+          //     'https://localhost:7221/blast-plans',
           //     ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
           //   ],
           //   [
-          //     'https://localhost:7221/blast-plans',
+          //     'https://localhost:7221/blast-plans/',
+          //     ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
+          //   ],
+          //   [
+          //     'https://localhost:7221/blast-plans/*/approve',
           //     ['api://9b84c3bc-479f-4f57-b5eb-8efef1f6e062/blastplans.write']
           //   ]
           // ])

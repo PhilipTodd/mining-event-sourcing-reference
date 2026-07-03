@@ -42,7 +42,7 @@ stages:
             workingDirectory: '$(uiProjectRoot)'
 
           - script: |
-              npm run build
+              npm run build -- --configuration production
             displayName: 'Build Angular app'
             workingDirectory: '$(uiProjectRoot)'
 

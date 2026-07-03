@@ -25,17 +25,9 @@ import { MsalService } from '@azure/msal-angular';
 export class AppShell {
   private readonly msal = inject(MsalService);
 
-  //readonly account = computed(() =>
-  //  this.msal.instance.getActiveAccount()
-  //  ?? this.msal.instance.getAllAccounts()[0]
-  //  ?? null
-  //);
-
   isAuthenticated(): boolean {
     return this.msal.instance.getAllAccounts().length > 0;
   }
-
-  //readonly isAuthenticated = computed(() => this.account() !== null);
 
   login(): void {
     this.msal.instance.initialize().then(() => {
