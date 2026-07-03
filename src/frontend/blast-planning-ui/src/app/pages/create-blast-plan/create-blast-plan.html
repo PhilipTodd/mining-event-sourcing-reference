@@ -15,17 +15,27 @@
         <mat-form-field appearance="outline">
           <mat-label>Name</mat-label>
           <input matInput formControlName="name" placeholder="North Pit Pattern A" />
-          <mat-error *ngIf="form.controls.name.hasError('required')">
+
+          <!-- <mat-error *ngIf="form.controls.name.hasError('required')">
             Name is required
-          </mat-error>
+          </mat-error> -->
+          @if (form.controls.name.hasError('required')) {
+             <mat-error>Name is required</mat-error>
+          }
+
         </mat-form-field>
 
         <mat-form-field appearance="outline">
           <mat-label>Site ID</mat-label>
           <input matInput formControlName="siteId" placeholder="site-001" />
-          <mat-error *ngIf="form.controls.siteId.hasError('required')">
+          
+          @if (form.controls.name.hasError('required')) {
+             <mat-error>Site ID is required</mat-error>
+          }
+          <!-- <mat-error *ngIf="form.controls.siteId.hasError('required')">
             Site ID is required
-          </mat-error>
+          </mat-error> -->
+          
         </mat-form-field>
 
         <div class="actions">

@@ -3,6 +3,13 @@
     <span class="title">Blast Planning Reference</span>
     <span class="subtitle">Event Sourcing • CQRS • Azure</span>
   </div>
+
+  @if (isAuthenticated()) {
+    <button mat-button (click)="logout()">Logout</button>
+  } @else {
+    <button mat-button (click)="login()">Login</button>
+  }
+
 </mat-toolbar>
 
 <mat-sidenav-container class="shell">

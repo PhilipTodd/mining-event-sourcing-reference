@@ -6,14 +6,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { NgIf } from '@angular/common';
+import { ChangeDetectorRef } from '@angular/core';
 
 import { BlastPlanApiService } from '../../core/services/blast-plan-api.service';
 
 @Component({
   selector: 'app-create-blast-plan',
   imports: [
-    NgIf,
     ReactiveFormsModule,
     MatCardModule,
     MatFormFieldModule,
@@ -33,7 +32,8 @@ export class CreateBlastPlan {
     private readonly fb: FormBuilder,
     private readonly api: BlastPlanApiService,
     private readonly router: Router,
-    private readonly snackBar: MatSnackBar) {
+    private readonly snackBar: MatSnackBar,
+    private readonly cdr: ChangeDetectorRef) {
     this.form = this.fb.nonNullable.group({
       name: ['', [Validators.required, Validators.maxLength(200)]],
       siteId: ['', [Validators.required, Validators.maxLength(100)]]
@@ -55,6 +55,7 @@ export class CreateBlastPlan {
       },
       error: () => {
         this.isSubmitting = false;
+        this.cdr.detectChanges();
         this.snackBar.open('Failed to create blast plan', 'Dismiss', { duration: 5000 });
       }
     });

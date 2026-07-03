@@ -4,66 +4,109 @@
     <p>Current state is read from the Azure SQL projection.</p>
   </header>
 
-  <mat-card *ngIf="summary; else notFound">
-    <mat-card-header>
-      <mat-card-title>{{ summary.name }}</mat-card-title>
-      <mat-card-subtitle>{{ summary.blastPlanId }}</mat-card-subtitle>
-    </mat-card-header>
+  @if (isLoading) {
 
-    <mat-card-content>
-      <div class="summary">
-        <div>
-          <span class="label">Site ID</span>
-          <span>{{ summary.siteId }}</span>
-        </div>
-
-        <div>
-          <span class="label">Status</span>
-          <mat-chip>{{ summary.status }}</mat-chip>
-        </div>
-
-        <div>
-          <span class="label">Created UTC</span>
-          <span>{{ summary.createdUtc }}</span>
-        </div>
-
-        <div>
-          <span class="label">Approved UTC</span>
-          <span>{{ summary.approvedUtc || 'Not approved' }}</span>
-        </div>
-      </div>
-    </mat-card-content>
-
-    <mat-card-actions>
-      <button mat-raised-button
-              color="primary"
-              (click)="approve()"
-              [disabled]="summary.status === 'Approved' || isApproving">
-        Approve
-      </button>
-
-      <button mat-button (click)="load()" [disabled]="isLoading">
-        Refresh
-      </button>
-
-      <a mat-button routerLink="/blast-plans/search">
-        Lookup another
-      </a>
-    </mat-card-actions>
-  </mat-card>
-
-  <ng-template #notFound>
     <mat-card>
       <mat-card-header>
-        <mat-card-title>Blast plan not found</mat-card-title>
+        <mat-card-title>Projection pending</mat-card-title>
+        <mat-card-subtitle>Waiting for the SQL read model to update...</mat-card-subtitle>
+      </mat-card-header>
+    </mat-card>
+
+  } @else if (summary; as blastPlan) {
+  
+    <mat-card>
+
+      <mat-card-header>
+        <mat-card-title>{{ blastPlan.name }}</mat-card-title>
+        <mat-card-subtitle>{{ blastPlan.blastPlanId }}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+
+        <div class="summary">
+
+          <div>
+            <span class="label">Site ID</span>
+            <span>{{ blastPlan.siteId }}</span>
+          </div>
+
+          <div>
+            <span class="label">Status</span>
+            <mat-chip>{{ blastPlan.status }}</mat-chip>
+          </div>
+
+          <div>
+            <span class="label">Created UTC</span>
+            <span>{{ blastPlan.createdUtc }}</span>
+          </div>
+
+          <div>
+            <span class="label">Approved UTC</span>
+            <span>{{ blastPlan.approvedUtc || 'Not approved' }}</span>
+          </div>
+
+        </div>
+
+      </mat-card-content>
+
+      <mat-card-actions>
+
+        @if (loggedIn) {
+          <button
+            mat-raised-button
+            color="primary"
+            (click)="approve()"
+            [disabled]="blastPlan.status === 'Approved' || isApproving">
+            Approve
+          </button>
+        }
+
+        <button
+          mat-button
+          (click)="load()"
+          [disabled]="isLoading">
+          Refresh
+        </button>
+
+        <a
+          mat-button
+          routerLink="/blast-plans/search">
+          Lookup Another
+        </a>
+
+      </mat-card-actions>
+
+    </mat-card>
+
+  } @else {
+
+    <mat-card>
+
+      <mat-card-header>
+        <mat-card-title>Blast Plan Not Found</mat-card-title>
         <mat-card-subtitle>{{ blastPlanId }}</mat-card-subtitle>
       </mat-card-header>
 
+      <mat-card-content>
+        <p>
+          No projection exists for the requested Blast Plan.
+        </p>
+      </mat-card-content>
+
       <mat-card-actions>
-        <a mat-raised-button color="primary" routerLink="/blast-plans/search">
-          Back to lookup
+
+        <a
+          mat-raised-button
+          color="primary"
+          routerLink="/blast-plans/search">
+          Back to Lookup
         </a>
+
       </mat-card-actions>
+
     </mat-card>
-  </ng-template>
+
+  }
+
 </section>
