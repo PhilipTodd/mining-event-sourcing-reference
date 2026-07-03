@@ -27,6 +27,7 @@ param serviceBusSubscriptionName string = 'blast-plan-projections'
 param appServicePlanName string
 param apiAppName string
 param workerAppName string
+param uiAppName string
 
 module cosmos '../../modules/cosmosdb.bicep' = {
   name: 'cosmos-${projectName}-${environmentName}'
@@ -75,6 +76,7 @@ module appService '../../modules/appservice.bicep' = {
     location: location
     appServicePlanName: appServicePlanName
     apiAppName: apiAppName
+    uiAppName: uiAppName
     workerAppName: workerAppName
     applicationInsightsConnectionString: monitoring.outputs.applicationInsightsConnectionString
   }
@@ -98,6 +100,7 @@ output applicationInsightsConnectionString string = monitoring.outputs.applicati
 
 output appServicePlanName string = appService.outputs.appServicePlanName
 output apiAppName string = appService.outputs.apiAppName
+output uiAppName string = appService.outputs.uiAppName
 output workerAppName string = appService.outputs.workerAppName
 output apiAppDefaultHostName string = appService.outputs.apiAppDefaultHostName
 output workerAppDefaultHostName string = appService.outputs.workerAppDefaultHostName
