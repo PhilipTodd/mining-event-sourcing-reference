@@ -41,6 +41,9 @@ stages:
                   --parameters $(parametersFile) 
             env:    
               SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
+              COSMOS_CONNECTION_STRING: $(CosmosConnectionString)
+              SQL_CONNECTION_STRING: $(SqlConnectionString)
+              SERVICEBUS_CONNECTION_STRING: $(ServiceBusConnectionString)
 
   - stage: WhatIf
     displayName: 'What-If'
@@ -62,6 +65,9 @@ stages:
                   --parameters $(parametersFile) 
             env:    
               SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
+              COSMOS_CONNECTION_STRING: $(CosmosConnectionString)
+              SQL_CONNECTION_STRING: $(SqlConnectionString)
+              SERVICEBUS_CONNECTION_STRING: $(ServiceBusConnectionString)
 
   - stage: Deploy
     displayName: 'Deploy Infrastructure'
@@ -90,3 +96,6 @@ stages:
                         --parameters $(parametersFile) 
                   env:    
                     SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
+                    COSMOS_CONNECTION_STRING: $(CosmosConnectionString)
+                    SQL_CONNECTION_STRING: $(SqlConnectionString)
+                    SERVICEBUS_CONNECTION_STRING: $(ServiceBusConnectionString)
