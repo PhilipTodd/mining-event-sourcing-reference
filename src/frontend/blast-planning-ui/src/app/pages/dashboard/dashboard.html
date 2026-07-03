@@ -1,0 +1,74 @@
+<section class="page">
+  <header class="page-header">
+    <h1>Dashboard</h1>
+    <p>Azure-native event-sourced reference architecture.</p>
+  </header>
+
+  <div class="grid">
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>account_tree</mat-icon>
+        <mat-card-title>Architecture</mat-card-title>
+        <mat-card-subtitle>Event Sourcing + CQRS</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="stack">
+          <mat-chip>Cosmos DB Event Store</mat-chip>
+          <mat-chip>Service Bus Topic</mat-chip>
+          <mat-chip>Projection Worker</mat-chip>
+          <mat-chip>Azure SQL Read Model</mat-chip>
+          <mat-chip>Application Insights</mat-chip>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>bolt</mat-icon>
+        <mat-card-title>Quick Actions</mat-card-title>
+        <mat-card-subtitle>Run the demo workflow</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-actions>
+        <a mat-raised-button color="primary" routerLink="/blast-plans/create">
+          Create Blast Plan
+        </a>
+        <a mat-button routerLink="/blast-plans/search">
+          Lookup Blast Plan
+        </a>
+      </mat-card-actions>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>sync_alt</mat-icon>
+        <mat-card-title>System Flow</mat-card-title>
+        <mat-card-subtitle>Command to projection</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <ol class="flow">
+          <li>Command submitted to API</li>
+          <li>Domain event persisted to Cosmos DB</li>
+          <li>Event published to Service Bus</li>
+          <li>Projection Worker updates Azure SQL</li>
+          <li>Query API reads SQL read model</li>
+        </ol>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+      <mat-card-header>
+        <mat-icon mat-card-avatar>verified</mat-icon>
+        <mat-card-title>Security</mat-card-title>
+        <mat-card-subtitle>Microsoft Entra ID</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p>Write endpoints are protected using OAuth2/JWT bearer authentication.</p>
+        <p>Read and health endpoints remain open for demonstration.</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</section>

@@ -1,0 +1,49 @@
+.page {
+  max-width: 1200px;
+}
+
+.page-header {
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  p {
+    margin: 8px 0 0;
+    opacity: 0.75;
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+ol {
+  margin: 0;
+  padding-left: 20px;
+
+  li {
+    margin-bottom: 8px;
+  }
+}
+
+mat-card {
+  min-height: 220px;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
