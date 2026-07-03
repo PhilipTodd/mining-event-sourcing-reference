@@ -24,7 +24,7 @@ stages:
               versionSpec: '$(nodeVersion)'
 
           - script: |
-              npm ci
+              npm install
             displayName: 'Install dependencies'
             workingDirectory: '$(uiProjectRoot)'
 
