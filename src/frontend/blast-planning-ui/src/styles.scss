@@ -8,31 +8,96 @@
 
 html {
   height: 100%;
+
   @include mat.theme((
     color: (
+      theme-type: light,
       primary: mat.$azure-palette,
       tertiary: mat.$blue-palette,
     ),
     typography: Roboto,
-    density: 0,
+    density: -1,
   ));
 }
 
+* {
+  box-sizing: border-box;
+}
+
 body {
-  // Default the application to a light color theme. This can be changed to
-  // `dark` to enable the dark color theme, or to `light dark` to defer to the
-  // user's system settings.
-  color-scheme: light;
-
-  // Set a default background, font and text colors for the application using
-  // Angular Material's system-level CSS variables. Learn more about these
-  // variables at https://material.angular.dev/guide/system-variables
-  background-color: var(--mat-sys-surface);
-  color: var(--mat-sys-on-surface);
-  font: var(--mat-sys-body-medium);
-
-  // Reset the user agent margin.
   margin: 0;
   height: 100%;
+  color-scheme: light;
+
+  background: #f4f7fa;
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
 }
-/* You can add global styles to this file, and also import other style files */
+
+mat-toolbar {
+  box-shadow: var(--mat-sys-level2);
+}
+
+mat-card {
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e2e8f0;
+}
+
+mat-card-content {
+    padding-top: 16px;
+}
+
+mat-card-actions {
+    padding: 16px;
+}
+
+button {
+  border-radius: 8px;
+}
+
+a {
+  text-decoration: none;
+}
+
+.page {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 28px;
+
+  h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #172033;
+  }
+
+  p {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 15px;
+  }
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 500;
+}
+
+.page-header p {
+    margin-top: 8px;
+    color: #5f6368;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.form-grid {
+    display: grid;
+    gap: 20px;
+}
