@@ -1,81 +1,147 @@
 <section class="page">
+
   <header class="page-header">
     <h1>About</h1>
     <p>Reference implementation for an Azure-native event-sourced system.</p>
   </header>
 
+  <!-- Hero -->
+
+  <mat-card class="hero">
+
+    <mat-card-content>
+
+      <div class="hero-grid">
+
+        <div>
+
+          <h2>Azure Event Sourcing Reference</h2>
+
+          <p>
+            Demonstrates a production-style CQRS and Event Sourcing architecture
+            built with .NET 10, Angular, Azure SQL, Cosmos DB and Azure Service Bus.
+          </p>
+
+          <div class="hero-actions">
+
+            <a mat-raised-button color="primary">
+              Architecture
+            </a>
+
+            <a mat-stroked-button>
+              GitHub
+            </a>
+
+            <a mat-stroked-button>
+              Live Demo
+            </a>
+
+          </div>
+
+        </div>
+
+        <div class="hero-stats">
+
+          <div class="stat">
+            <span class="value">.NET 10</span>
+            <span class="label">Backend</span>
+          </div>
+
+          <div class="stat">
+            <span class="value">Angular 20</span>
+            <span class="label">Frontend</span>
+          </div>
+
+          <div class="stat">
+            <span class="value">Azure</span>
+            <span class="label">Cloud Native</span>
+          </div>
+
+          <div class="stat">
+            <span class="value">CQRS</span>
+            <span class="label">Architecture</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </mat-card-content>
+
+  </mat-card>
+
+  <!-- Bottom row -->
+
   <div class="grid">
+
     <mat-card>
+
       <mat-card-header>
-        <mat-icon mat-card-avatar>flag</mat-icon>
-        <mat-card-title>Project Purpose</mat-card-title>
-        <mat-card-subtitle>Architecture reference</mat-card-subtitle>
+
+        <mat-icon mat-card-avatar>account_tree</mat-icon>
+
+        <mat-card-title>Architecture</mat-card-title>
+
+        <mat-card-subtitle>Command → Event → Projection → Query</mat-card-subtitle>
+
       </mat-card-header>
 
       <mat-card-content>
-        <p>
-          This application demonstrates a production-style event-sourced workflow
-          using Azure PaaS services, CQRS, asynchronous projections, and modern
-          delivery practices.
-        </p>
+
+        <div class="timeline">
+
+          <div class="timeline-item">Angular UI submits command</div>
+
+          <div class="timeline-item">API validates aggregate</div>
+
+          <div class="timeline-item">Event stored in Cosmos DB</div>
+
+          <div class="timeline-item">Event published to Service Bus</div>
+
+          <div class="timeline-item">Projection Worker updates Azure SQL</div>
+
+          <div class="timeline-item">Queries served from read model</div>
+
+        </div>
+
       </mat-card-content>
+
     </mat-card>
 
     <mat-card>
-      <mat-card-header>
-        <mat-icon mat-card-avatar>hub</mat-icon>
-        <mat-card-title>Architecture Summary</mat-card-title>
-        <mat-card-subtitle>Command, event, projection, query</mat-card-subtitle>
-      </mat-card-header>
 
-      <mat-card-content>
-        <ol>
-          <li>Commands are submitted through the API.</li>
-          <li>Domain events are persisted to Cosmos DB.</li>
-          <li>Events are published to Azure Service Bus.</li>
-          <li>A projection worker updates Azure SQL read models.</li>
-          <li>The UI queries the read model through the API.</li>
-        </ol>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card>
       <mat-card-header>
-        <mat-icon mat-card-avatar>cloud</mat-icon>
+
+        <mat-icon mat-card-avatar>cloud_queue</mat-icon>
+
         <mat-card-title>Azure Services</mat-card-title>
-        <mat-card-subtitle>Cloud platform components</mat-card-subtitle>
+
       </mat-card-header>
 
       <mat-card-content>
-        <div class="chips">
-          <mat-chip>Azure App Service</mat-chip>
-          <mat-chip>Azure Cosmos DB</mat-chip>
-          <mat-chip>Azure SQL</mat-chip>
-          <mat-chip>Azure Service Bus</mat-chip>
-          <mat-chip>Application Insights</mat-chip>
-          <mat-chip>Log Analytics</mat-chip>
-          <mat-chip>Microsoft Entra ID</mat-chip>
+
+        <div class="stack">
+
+          <mat-chip class="chip-appservice">App Service</mat-chip>
+
+          <mat-chip class="chip-cosmos">Cosmos DB</mat-chip>
+
+          <mat-chip class="chip-sql">Azure SQL</mat-chip>
+
+          <mat-chip class="chip-servicebus">Service Bus</mat-chip>
+
+          <mat-chip class="chip-ai">Application Insights</mat-chip>
+
+          <mat-chip class="chip-loganalytics">Log Analytics</mat-chip>
+
+          <mat-chip class="chip-entra">Microsoft Entra ID</mat-chip>
+
         </div>
+
       </mat-card-content>
+
     </mat-card>
 
-    <mat-card>
-      <mat-card-header>
-        <mat-icon mat-card-avatar>code</mat-icon>
-        <mat-card-title>Technology Stack</mat-card-title>
-        <mat-card-subtitle>Implementation technologies</mat-card-subtitle>
-      </mat-card-header>
-
-      <mat-card-content>
-        <div class="chips">
-          <mat-chip>.NET 10</mat-chip>
-          <mat-chip>C#</mat-chip>
-          <mat-chip>Angular</mat-chip>
-          <mat-chip>Angular Material</mat-chip>
-          <mat-chip>Bicep</mat-chip>
-          <mat-chip>Azure DevOps</mat-chip>
-        </div>
-      </mat-card-content>
-    </mat-card>
   </div>
+
 </section>
