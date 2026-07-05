@@ -4,6 +4,15 @@
     <p>Azure-native event-sourced reference architecture.</p>
   </header>
 
+  
+  <div class="status-strip">
+    <div><strong>API</strong><span>Healthy</span></div>
+    <div><strong>Worker</strong><span>Running</span></div>
+    <div><strong>Cosmos DB</strong><span>Connected</span></div>
+    <div><strong>SQL</strong><span>Connected</span></div>
+    <div><strong>App Insights</strong><span>Enabled</span></div>
+  </div>
+
   <div class="grid">
     <mat-card>
       <mat-card-header>
@@ -14,11 +23,11 @@
 
       <mat-card-content>
         <div class="stack">
-          <mat-chip>Cosmos DB Event Store</mat-chip>
-          <mat-chip>Service Bus Topic</mat-chip>
-          <mat-chip>Projection Worker</mat-chip>
-          <mat-chip>Azure SQL Read Model</mat-chip>
-          <mat-chip>Application Insights</mat-chip>
+          <mat-chip class="chip-cosmos">Event Store</mat-chip>
+          <mat-chip class="chip-servicebus">Message Broker</mat-chip>
+          <mat-chip class="chip-worker">Projection Worker</mat-chip>
+          <mat-chip class="chip-sql">Read Model</mat-chip>
+          <mat-chip class="chip-ai">Observability</mat-chip>
         </div>
       </mat-card-content>
     </mat-card>
@@ -30,14 +39,17 @@
         <mat-card-subtitle>Run the demo workflow</mat-card-subtitle>
       </mat-card-header>
 
-      <mat-card-actions>
-        <a mat-raised-button color="primary" routerLink="/blast-plans/create">
-          Create Blast Plan
-        </a>
-        <a mat-button routerLink="/blast-plans/search">
-          Lookup Blast Plan
-        </a>
-      </mat-card-actions>
+      <mat-card-content>
+        <div class="quick-actions">
+          <a mat-raised-button color="primary" routerLink="/blast-plans/create">
+            Create Blast Plan
+          </a>
+
+          <a mat-stroked-button routerLink="/blast-plans/search">
+            Lookup Blast Plan
+          </a>
+        </div>
+      </mat-card-content>
     </mat-card>
 
     <mat-card>
@@ -48,13 +60,13 @@
       </mat-card-header>
 
       <mat-card-content>
-        <ol class="flow">
-          <li>Command submitted to API</li>
-          <li>Domain event persisted to Cosmos DB</li>
-          <li>Event published to Service Bus</li>
-          <li>Projection Worker updates Azure SQL</li>
-          <li>Query API reads SQL read model</li>
-        </ol>
+        <div class="timeline">
+          <div class="timeline-item">Command submitted to API</div>
+          <div class="timeline-item">Domain event persisted to Cosmos DB</div>
+          <div class="timeline-item">Event published to Service Bus</div>
+          <div class="timeline-item">Projection Worker updates Azure SQL</div>
+          <div class="timeline-item">Query API reads SQL read model</div>
+        </div>
       </mat-card-content>
     </mat-card>
 

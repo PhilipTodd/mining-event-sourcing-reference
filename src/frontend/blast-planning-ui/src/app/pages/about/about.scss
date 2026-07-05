@@ -1,49 +1,184 @@
-.page {
-  max-width: 1200px;
+.hero {
+
+  margin-bottom: 28px;
+
+  border-left: 6px solid #0078d4;
 }
 
-.page-header {
-  margin-bottom: 24px;
+.hero-grid {
 
-  h1 {
-    margin: 0;
-    font-size: 32px;
-    font-weight: 600;
-  }
-
-  p {
-    margin: 8px 0 0;
-    opacity: 0.75;
-  }
-}
-
-.grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+
+  grid-template-columns: 2fr 1fr;
+
+  gap: 40px;
+
+  align-items: center;
 }
 
-.chips {
+.hero h2 {
+
+  margin-top: 0;
+
+  font-size: 32px;
+
+  margin-bottom: 16px;
+}
+
+.hero p {
+
+  font-size: 16px;
+
+  color: #4b5563;
+
+  line-height: 1.6;
+}
+
+.hero-actions {
+
   display: flex;
-  flex-wrap: wrap;
+
+  gap: 12px;
+
+  margin-top: 28px;
+}
+
+.hero-stats {
+
+  display: grid;
+
+  grid-template-columns: repeat(2,1fr);
+
+  gap: 18px;
+}
+
+.stat {
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   gap: 8px;
 }
 
-ol {
-  margin: 0;
-  padding-left: 20px;
-
-  li {
-    margin-bottom: 8px;
-  }
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
 }
 
-mat-card {
-  min-height: 220px;
+.stack mat-chip-row,
+.stack mat-chip {
+  margin: 2px;
 }
 
-@media (max-width: 900px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
+.value {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #0078d4;
+  line-height: 1.1;
+}
+
+.label {
+  display: block;
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+.label {
+
+  color: #64748b;
+}
+
+.grid {
+
+  display: grid;
+
+  grid-template-columns: repeat(2,minmax(0,1fr));
+
+  gap: 28px;
+}
+
+.timeline {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 16px;
+}
+
+.timeline-item {
+
+    position: relative;
+
+    padding-left: 28px;
+}
+
+.timeline-item::before {
+
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+
+    top: 6px;
+
+    width: 10px;
+
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #0078d4;
+}
+
+.timeline-item::after {
+
+    content: "";
+
+    position: absolute;
+
+    left: 4px;
+
+    top: 20px;
+
+    width: 2px;
+
+    height: 18px;
+
+    background: #cbd5e1;
+}
+
+.timeline-item:last-child::after {
+
+    display: none;
+}
+
+.chip-appservice {
+
+    background: #eef6ff !important;
+
+    color: #005fb8 !important;
+}
+
+.chip-loganalytics {
+
+    background: #f5f7fa !important;
+
+    color: #475569 !important;
+}
+
+.chip-entra {
+
+    background: #edf2ff !important;
+
+    color: #3730a3 !important;
 }
