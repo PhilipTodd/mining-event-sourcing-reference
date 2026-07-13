@@ -37,4 +37,4 @@ A production-style reference implementation demonstrating:
 
 ## Live Demo
 
-*Coming Soon*
+[Launch demo site](https://demo.event-sourcing.ausdatatech.com.au/){:target="_blank"}
