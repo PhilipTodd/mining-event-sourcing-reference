@@ -7,7 +7,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.2" />
     <PackageReference Include="Dapper" Version="2.1.79" />
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.61.0" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
