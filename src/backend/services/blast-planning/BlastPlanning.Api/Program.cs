@@ -1,6 +1,7 @@
 using BlastPlanning.Application.BlastPlans.Commands.ApproveBlastPlan;
 using BlastPlanning.Application.BlastPlans.Commands.CreateBlastPlan;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+using BlastPlanning.Application.BlastPlans.Queries.GetRecentBlastPlans;
 using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Exceptions;
 using BlastPlanning.Infrastructure;
@@ -27,8 +28,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 // Add observability services
-builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddHealthChecks();
+if (!builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddApplicationInsightsTelemetry();
+}
 
 // Add authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -128,51 +132,68 @@ app.UseExceptionHandler(errorApp =>
 
 
 // Add a blast plan
-app.MapPost("/blast-plans", async (
-    CreateBlastPlanRequest request,
-    ISender sender,
-    CancellationToken cancellationToken) =>
-{
-    var result = await sender.Send(
-        new CreateBlastPlanCommand(
-            request.Name,
-            request.SiteId),
-        cancellationToken);
+app.MapPost("/blast-plans", 
+    async (CreateBlastPlanRequest request,
+        ISender sender,
+        CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new CreateBlastPlanCommand(
+                    request.Name,
+                    request.SiteId),
+                cancellationToken);
 
-    return Results.Created(
-        $"/blast-plans/{result.BlastPlanId}",
-        result);
-}).RequireAuthorization();
+            return Results.Created(
+                $"/blast-plans/{result.BlastPlanId}",
+                result);
+        }).RequireAuthorization();
 
 // Approve a blast plan
-app.MapPost("/blast-plans/{id:guid}/approve", async (
-    Guid id,
-    ApproveBlastPlanRequest request,
-    ISender sender,
-    CancellationToken cancellationToken) =>
-{
-    await sender.Send(
-        new ApproveBlastPlanCommand(id, request.ApprovedBy),
-        cancellationToken);
+app.MapPost("/blast-plans/{id:guid}/approve", 
+    async (Guid id,
+        ApproveBlastPlanRequest request,
+        ISender sender,
+        CancellationToken cancellationToken) =>
+        {
+            await sender.Send(
+                new ApproveBlastPlanCommand(id, request.ApprovedBy),
+                cancellationToken);
 
-    return Results.NoContent();
-}).RequireAuthorization();
+            return Results.NoContent();
+        }).RequireAuthorization();
 
 // Get a blast plan summary
-app.MapGet("/blast-plans/{id:guid}", async (
-    Guid id,
-    ISender sender,
-    CancellationToken cancellationToken) =>
-{
-    var result = await sender.Send(
-        new GetBlastPlanSummaryQuery(id),
-        cancellationToken);
+app.MapGet("/blast-plans/{id:guid}", 
+    async (Guid id,
+        ISender sender,
+        CancellationToken cancellationToken) =>
+        {
+            var result = await sender.Send(
+                new GetBlastPlanSummaryQuery(id),
+                cancellationToken);
 
-    return result is null
-        ? Results.NotFound()
-        : Results.Ok(result);
-});
+            return result is null
+                ? Results.NotFound()
+                : Results.Ok(result);
+        });
 
+app.MapGet("/blast-plans/recent",
+    async (
+        GetRecentBlastPlansQueryHandler handler,
+        CancellationToken cancellationToken) =>
+        {
+            var query = new GetRecentBlastPlansQuery(Limit: 20);
+
+            var blastPlans = await handler.HandleAsync(
+                query,
+                cancellationToken);
+
+            return Results.Ok(blastPlans);
+        })
+        .AllowAnonymous()
+        .WithName("GetRecentBlastPlans")
+        .WithTags("Blast Plans")
+        .Produces<IReadOnlyList<RecentBlastPlanSummary>>(StatusCodes.Status200OK);
 
 // Legacy endpoint for testing only - to be removed
 var summaries = new[]
@@ -210,3 +231,5 @@ record WeatherForecast(
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
 }
+
+public partial class Program;

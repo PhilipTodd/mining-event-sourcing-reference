@@ -1,5 +1,6 @@
 ﻿using BlastPlanning.Application.Abstractions.ReadModels;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+using BlastPlanning.Application.BlastPlans.Queries.GetRecentBlastPlans;
 using FluentAssertions;
 
 namespace BlastPlanning.Application.Tests.BlastPlans.Queries;
@@ -52,6 +53,13 @@ public sealed class GetBlastPlanSummaryQueryHandlerTests
             CancellationToken cancellationToken = default)
         {
             return Task.FromResult(summary);
+        }
+
+        public async Task<IReadOnlyList<RecentBlastPlanSummary>> GetRecentAsync(
+            int limit,
+            CancellationToken cancellationToken = default)
+        {
+            return new List<RecentBlastPlanSummary>();
         }
 
         public Task SaveAsync(
