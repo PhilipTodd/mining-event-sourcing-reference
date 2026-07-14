@@ -15,6 +15,7 @@
     <Project Path="src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/BlastPlanning.Api.Tests/BlastPlanning.Api.Tests.csproj" />
     <Project Path="tests/BlastPlanning.Application.Tests/BlastPlanning.Application.Tests.csproj" />
     <Project Path="tests/BlastPlanning.Domain.Tests/BlastPlanning.Domain.Tests.csproj" />
     <Project Path="tests/BlastPlanning.Infrastructure.Tests/BlastPlanning.Infrastructure.Tests.csproj" />

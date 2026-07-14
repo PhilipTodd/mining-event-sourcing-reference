@@ -3,7 +3,7 @@ using BlastPlanning.Application.Abstractions.Clock;
 using BlastPlanning.Application.Abstractions.EventStore;
 using BlastPlanning.Application.Abstractions.Messaging;
 using BlastPlanning.Application.Abstractions.ReadModels;
-
+using BlastPlanning.Application.BlastPlans.Queries.GetRecentBlastPlans;
 using BlastPlanning.Infrastructure.Clock;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
 using BlastPlanning.Infrastructure.EventStore.InMemory;
@@ -65,6 +65,7 @@ public static class DependencyInjection
 
         services.AddScoped<SqlConnectionFactory>();
 
+        services.AddScoped<GetRecentBlastPlansQueryHandler>();
 
         services.Configure<ServiceBusOptions>(
             configuration.GetSection(ServiceBusOptions.SectionName));

@@ -1,11 +1,12 @@
 ﻿using BlastPlanning.Application.Abstractions.ReadModels;
 using BlastPlanning.Application.BlastPlans.Queries.GetBlastPlanSummary;
+using BlastPlanning.Application.BlastPlans.Queries.GetRecentBlastPlans;
 using BlastPlanning.Application.Common.Exceptions;
 using BlastPlanning.Domain.Events;
 using BlastPlanning.Domain.ValueObjects;
 using BlastPlanning.Infrastructure.EventStore.Cosmos;
-using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using BlastPlanning.Infrastructure.Messaging;
+using BlastPlanning.Infrastructure.Projections.BlastPlans;
 using FluentAssertions;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
@@ -190,6 +191,28 @@ public sealed class CosmosEventStoreTests : IAsyncLifetime
             _items.TryGetValue(blastPlanId, out var result);
 
             return Task.FromResult(result);
+        }
+
+        public async Task<IReadOnlyList<RecentBlastPlanSummary>> GetRecentAsync(
+            int limit,
+            CancellationToken cancellationToken = default)
+        {
+            // Assuming standard sorting by CreatedUtc descending to get the "recent" plans
+            IReadOnlyList<RecentBlastPlanSummary> recentPlans = _items.Values
+                .OrderByDescending(dto => dto.CreatedUtc) // Replace with your actual sorting logic if different
+                .Take(20)
+                .Select(dto => new RecentBlastPlanSummary(
+                    dto.BlastPlanId, // If the Dto doesn't contain the Id, use KeyValuePair: pair.Key
+                    dto.Name,
+                    dto.SiteId,
+                    dto.Status,
+                    dto.CreatedUtc.UtcDateTime, // Converts DateTimeOffset to DateTime (Kind: Utc)
+                    dto.ApprovedUtc?.UtcDateTime // Handles the nullable DateTimeOffset?
+                ))
+                .ToList(); // ToList() satisfies IReadOnlyList<T>
+
+            return recentPlans;
+            //return new List<RecentBlastPlanSummary>();
         }
 
         public Task SaveAsync(
