@@ -1,0 +1,102 @@
+.page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-header h1 {
+  margin: 0;
+}
+
+.page-header p {
+  margin: 0.35rem 0 0;
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  white-space: nowrap;
+}
+
+td,
+th {
+  padding-right: 1.5rem;
+}
+
+.name-cell {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 15rem;
+}
+
+.name-cell span {
+  color: var(--mat-sys-on-surface-variant);
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  min-width: 5rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-approved {
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+}
+
+.status-draft {
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+}
+
+.not-approved {
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.state-container {
+  min-height: 16rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+.state-container p {
+  margin: 0;
+}
+
+.error-state {
+  color: var(--mat-sys-error);
+}
+
+@media (max-width: 700px) {
+  .page-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .page-header button {
+    align-self: flex-start;
+  }
+}

@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 
@@ -37,4 +38,10 @@ export class BlastPlanApiService {
       `${this.baseUrl}/blast-plans/${blastPlanId}`
     );
   }
+
+  getRecentBlastPlans(): Observable<BlastPlanSummary[]> {
+    return this.http.get<BlastPlanSummary[]>(
+      `${environment.apiBaseUrl}/blast-plans/recent`
+    );
+  }  
 }

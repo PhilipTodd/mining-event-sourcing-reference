@@ -1,5 +1,5 @@
 import { Component, computed, inject } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
@@ -7,6 +7,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MsalService } from '@azure/msal-angular';
 import { ChangeDetectorRef } from '@angular/core';
+import {BlastPlanListRefreshService} from '../../core/services/blast-plan-list-refresh.service';
 
 @Component({
   selector: 'app-app-shell',
@@ -25,8 +26,11 @@ import { ChangeDetectorRef } from '@angular/core';
 })
 export class AppShell {
   private readonly msal = inject(MsalService);
+  private readonly router = inject(Router);
+  private readonly blastPlanListRefresh = inject(BlastPlanListRefreshService);
 
   constructor(private readonly cdr: ChangeDetectorRef) {
+
     this.msal.handleRedirectObservable().subscribe({
       next: result => {
         if (result?.account) {
@@ -84,4 +88,15 @@ export class AppShell {
       ?? '';
   }
 
+    async openBlastPlanList(): Promise<void> {
+    const isAlreadyOnListPage =
+      this.router.url.split('?')[0] === '/blast-plans';
+
+    if (isAlreadyOnListPage) {
+      this.blastPlanListRefresh.requestRefresh();
+      return;
+    }
+
+    await this.router.navigate(['/blast-plans']);
+  }
 }
