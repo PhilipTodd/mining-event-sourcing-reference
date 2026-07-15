@@ -15,18 +15,29 @@ export function msalInstanceFactory(): IPublicClientApplication {
   return new PublicClientApplication({
     auth: {
       clientId: environment.entra.clientId,
-      authority: `https://login.microsoftonline.com/${environment.entra.tenantId}`,
+      authority:
+        `https://login.microsoftonline.com/${environment.entra.tenantId}`,
       redirectUri: '/'
     }
   });
 }
 
-export function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {
+export function msalInterceptorConfigFactory():
+  MsalInterceptorConfiguration {
 
-  const protectedResourceMap = new Map<string, Array<string>>();
+  const apiBaseUrl =
+    environment.apiBaseUrl.replace(/\/+$/, '');
+
+  const protectedResourceMap =
+    new Map<string, Array<string> | null>();
 
   protectedResourceMap.set(
-    environment.apiBaseUrl,
+    `${apiBaseUrl}/blast-plans/recent`,
+    null
+  );
+
+  protectedResourceMap.set(
+    `${apiBaseUrl}/*`,
     [environment.entra.apiScope]
   );
 
@@ -36,7 +47,8 @@ export function msalInterceptorConfigFactory(): MsalInterceptorConfiguration {
   };
 }
 
-export function msalGuardConfigFactory(): MsalGuardConfiguration {
+export function msalGuardConfigFactory():
+  MsalGuardConfiguration {
 
   return {
     interactionType: InteractionType.Popup,

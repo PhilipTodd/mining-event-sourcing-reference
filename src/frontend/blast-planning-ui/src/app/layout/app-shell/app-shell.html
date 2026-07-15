@@ -55,6 +55,13 @@
         <span>Create Blast Plan</span>
       </a>
 
+      <a
+        mat-list-item
+        (click)="openBlastPlanList()">
+        <mat-icon matListItemIcon>view_list</mat-icon>
+        <span matListItemTitle>List Blast Plans</span>
+      </a>
+
       <a mat-list-item routerLink="/blast-plans/search" routerLinkActive="active">
         <mat-icon>search</mat-icon>
         <span>Lookup Blast Plan</span>

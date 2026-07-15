@@ -6,11 +6,16 @@ import { CreateBlastPlan } from './pages/create-blast-plan/create-blast-plan';
 import { BlastPlanDetail } from './pages/blast-plan-detail/blast-plan-detail';
 import { BlastPlanLookup } from './pages/blast-plan-lookup/blast-plan-lookup';
 import { About } from './pages/about/about';
+import {BlastPlanListComponent} from './pages/blast-plan-list/blast-plan-list';
 
 export const routes: Routes = [
   {
     path: '',
     component: Dashboard
+  },
+  {
+    path: 'blast-plans',
+    component: BlastPlanListComponent
   },
   {
     path: 'blast-plans/create',
