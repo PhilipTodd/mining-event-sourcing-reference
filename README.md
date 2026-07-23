@@ -9,7 +9,7 @@ https://event-sourcing.ausdatatech.com.au
 
 ## Live Demo
 
-Coming Soon
+[Launch demo site](https://demo.event-sourcing.ausdatatech.com.au/){:target="_blank"}
 
 ## Local Documentation
 
