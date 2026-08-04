@@ -73,7 +73,7 @@ stages:
           - script: |
               set -euo pipefail
 
-              test_projects=$(find src/tests \
+              test_projects=$(find tests \
                 -type f \
                 \( -name "*Tests.csproj" -o -name "*.Tests.csproj" \))
 
