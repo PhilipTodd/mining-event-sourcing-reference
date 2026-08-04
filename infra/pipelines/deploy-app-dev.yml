@@ -13,6 +13,9 @@ variables:
   buildConfiguration: 'Release'
   dotnetSdkVersion: '10.x'
 
+  applicationTestsProject: 'tests/BlastPlanning.Application.Tests/BlastPlanning.Application.Tests.csproj'
+  domainTestsProject: 'tests/BlastPlanning.Domain.Tests/BlastPlanning.Domain.Tests.csproj'
+  
   apiProject: 'src/backend/services/blast-planning/BlastPlanning.Api/BlastPlanning.Api.csproj'
   workerProject: 'src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj'
 
@@ -72,25 +75,18 @@ stages:
 
           - script: |
               set -euo pipefail
-
-              test_projects=$(find tests \
-                -type f \
-                \( -name "*Tests.csproj" -o -name "*.Tests.csproj" \))
-
-              if [ -z "$test_projects" ]; then
-                echo "No test projects were found."
-                exit 1
-              fi
-
-              while IFS= read -r project; do
-                echo "Testing $project"
-
-                dotnet test "$project" \
-                  --configuration "$(buildConfiguration)" \
-                  --logger "trx" \
-                  --results-directory "$(Agent.TempDirectory)/TestResults"
-              done <<< "$test_projects"
-            displayName: Run tests
+          
+              dotnet test "$(applicationTestsProject)" \
+                --configuration "$(buildConfiguration)" \
+                --logger "trx" \
+                --results-directory "$(Agent.TempDirectory)/TestResults"
+          
+              dotnet test "$(domainTestsProject)" \
+                --configuration "$(buildConfiguration)" \
+                --logger "trx" \
+                --results-directory "$(Agent.TempDirectory)/TestResults"
+          
+            displayName: Run Application and Domain tests
 
           - task: PublishTestResults@2
             displayName: Publish test results
