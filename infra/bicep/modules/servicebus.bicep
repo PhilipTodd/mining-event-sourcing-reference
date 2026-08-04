@@ -1,45 +1,74 @@
-param location string
-param namespaceName string
-param topicName string = 'domain-events'
-param subscriptionName string = 'blast-plan-projections'
+targetScope = 'resourceGroup'
 
-resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' = {
+@description('Name of the existing Azure Service Bus namespace.')
+param namespaceName string
+
+@description('Name of the Service Bus topic used for Blast Planning domain events.')
+param topicName string
+
+@description('Name of the subscription used by the Blast Planning projection worker.')
+param subscriptionName string
+
+@description('Default time-to-live for messages published to the topic.')
+param defaultMessageTimeToLive string = 'P14D'
+
+@description('Duplicate-detection history window.')
+param duplicateDetectionHistoryTimeWindow string = 'PT10M'
+
+@description('Maximum subscription delivery count before a message is dead-lettered.')
+@minValue(1)
+param maxDeliveryCount int = 10
+
+@description('Subscription message lock duration.')
+param lockDuration string = 'PT1M'
+
+@description('Subscription auto-delete-on-idle period. Empty means disabled.')
+param autoDeleteOnIdle string = ''
+
+resource serviceBusNamespace 'Microsoft.ServiceBus/namespaces@2024-01-01' existing = {
   name: namespaceName
-  location: location
-  sku: {
-    name: 'Standard'
-    tier: 'Standard'
-  }
-  properties: {
-    minimumTlsVersion: '1.2'
-    publicNetworkAccess: 'Enabled'
-  }
 }
 
 resource topic 'Microsoft.ServiceBus/namespaces/topics@2024-01-01' = {
   parent: serviceBusNamespace
   name: topicName
+
   properties: {
-    defaultMessageTimeToLive: 'P14D'
-    duplicateDetectionHistoryTimeWindow: 'PT10M'
-    enableBatchedOperations: true
+    defaultMessageTimeToLive: defaultMessageTimeToLive
+
+    requiresDuplicateDetection: true
+    duplicateDetectionHistoryTimeWindow: duplicateDetectionHistoryTimeWindow
+
     enablePartitioning: false
-    maxMessageSizeInKilobytes: 256
-    requiresDuplicateDetection: false
+    supportOrdering: true
+
+    maxSizeInMegabytes: 1024
+    status: 'Active'
   }
 }
 
 resource subscription 'Microsoft.ServiceBus/namespaces/topics/subscriptions@2024-01-01' = {
   parent: topic
   name: subscriptionName
+
   properties: {
-    lockDuration: 'PT1M'
-    maxDeliveryCount: 10
-    defaultMessageTimeToLive: 'P14D'
+    lockDuration: lockDuration
+    maxDeliveryCount: maxDeliveryCount
+
     deadLetteringOnMessageExpiration: true
+    deadLetteringOnFilterEvaluationExceptions: true
+
+    defaultMessageTimeToLive: defaultMessageTimeToLive
+    status: 'Active'
+
+    autoDeleteOnIdle: empty(autoDeleteOnIdle)
+      ? null
+      : autoDeleteOnIdle
   }
 }
 
-output namespaceName string = serviceBusNamespace.name
+output topicId string = topic.id
 output topicName string = topic.name
+
+output subscriptionId string = subscription.id
 output subscriptionName string = subscription.name
