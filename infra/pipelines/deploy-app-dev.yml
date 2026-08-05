@@ -270,4 +270,5 @@ stages:
                 az webapp show \
                   --name "$(functionAppName)" \
                   --resource-group "rg-event-sourcing-dev" \
+                  --query "{name:name,state:state,host:defaultHostName}" \
                   --output table
