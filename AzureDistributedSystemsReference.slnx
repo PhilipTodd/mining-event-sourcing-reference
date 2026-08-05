@@ -4,15 +4,15 @@
   <Folder Name="/src/backend/building-blocks/">
     <Project Path="src/backend/building-blocks/BlastPlanning.Contracts/BlastPlanning.Contracts.csproj" />
   </Folder>
+  <Folder Name="/src/backend/functions/">
+    <Project Path="src/backend/functions/BlastPlanning.ProjectionFunction/BlastPlanning.ProjectionFunction.csproj" />
+  </Folder>
   <Folder Name="/src/backend/services/" />
   <Folder Name="/src/backend/services/blast-planning/">
     <Project Path="src/backend/services/blast-planning/BlastPlanning.Api/BlastPlanning.Api.csproj" />
     <Project Path="src/backend/services/blast-planning/BlastPlanning.Application/BlastPlanning.Application.csproj" />
     <Project Path="src/backend/services/blast-planning/BlastPlanning.Domain/BlastPlanning.Domain.csproj" />
     <Project Path="src/backend/services/blast-planning/BlastPlanning.Infrastructure/BlastPlanning.Infrastructure.csproj" />
-  </Folder>
-  <Folder Name="/src/backend/workers/">
-    <Project Path="src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/BlastPlanning.Api.Tests/BlastPlanning.Api.Tests.csproj" />
