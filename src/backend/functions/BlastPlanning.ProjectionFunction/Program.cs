@@ -1,3 +1,4 @@
+using BlastPlanning.Infrastructure;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,5 +11,7 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights();
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Build().Run();

@@ -63,6 +63,9 @@ public static class DependencyInjection
             services.AddScoped<IEventStore, CosmosEventStore>();
         }
 
+        services.AddSingleton<EventDeserializer>();
+        services.AddScoped<ProjectionProcessor>();
+
         services.AddScoped<SqlConnectionFactory>();
 
         services.AddScoped<GetRecentBlastPlansQueryHandler>();

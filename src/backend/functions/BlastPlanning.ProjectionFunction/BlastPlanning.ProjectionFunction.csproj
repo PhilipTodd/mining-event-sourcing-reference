@@ -19,9 +19,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\building-blocks\BlastPlanning.Contracts\BlastPlanning.Contracts.csproj" />
     <ProjectReference Include="..\..\services\blast-planning\BlastPlanning.Application\BlastPlanning.Application.csproj" />
     <ProjectReference Include="..\..\services\blast-planning\BlastPlanning.Infrastructure\BlastPlanning.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\building-blocks\BlastPlanning.Contracts\BlastPlanning.Contracts.csproj" />
   </ItemGroup>
 
 </Project>

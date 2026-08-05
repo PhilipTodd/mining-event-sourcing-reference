@@ -1,6 +1,6 @@
-IF OBJECT_ID('dbo.BlastPlanSummary', 'U') IS NULL
+IF OBJECT_ID('BlastPlanning.BlastPlanSummary', 'U') IS NULL
         BEGIN
-            CREATE TABLE dbo.BlastPlanSummary
+            CREATE TABLE BlastPlanning.BlastPlanSummary
             (
                 BlastPlanId UNIQUEIDENTIFIER NOT NULL PRIMARY KEY,
                 Name NVARCHAR(200) NOT NULL,
