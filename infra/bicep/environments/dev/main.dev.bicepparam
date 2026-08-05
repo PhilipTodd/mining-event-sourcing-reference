@@ -1,4 +1,4 @@
-using '../../main.bicep'
+using './main.bicep'
 
 // ============================================================================
 // Environment
@@ -84,11 +84,8 @@ param corsAllowedOrigins = [
 // Values supplied by GitHub Environment secrets.
 // ============================================================================
 
-param cosmosConnectionString =
-  readEnvironmentVariable('COSMOS_CONNECTION_STRING')
+param cosmosConnectionString = readEnvironmentVariable('COSMOS_CONNECTION_STRING')
 
-param sqlConnectionString =
-  readEnvironmentVariable('SQL_CONNECTION_STRING')
+param sqlConnectionString = readEnvironmentVariable('SQL_CONNECTION_STRING')
 
-param serviceBusConnectionString =
-  readEnvironmentVariable('SERVICEBUS_CONNECTION_STRING')
+param serviceBusConnectionString = readEnvironmentVariable('SERVICEBUS_CONNECTION_STRING')

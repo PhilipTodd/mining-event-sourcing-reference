@@ -1,74 +1,162 @@
+name: deploy-event-sourcing-ui-dev-$(Date:yyyyMMdd)-$(Rev:r)
+
 trigger: none
 
 pr: none
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
   azureServiceConnection: 'sc-esr-dev'
-  uiAppName: 'esr-dev-ui'
-  uiProjectRoot: 'src/frontend/blast-planning-ui'
+
   nodeVersion: '24.x'
 
+  uiProjectDirectory: 'src/frontend/blast-planning-ui'
+  uiAppName: 'web-adt-blastplanning-dev'
+
+  uiBuildOutput: '$(Build.SourcesDirectory)/src/frontend/blast-planning-ui/dist/blast-planning-ui/browser'
+  uiPackagePath: '$(Build.ArtifactStagingDirectory)/ui.zip'
+
 stages:
+
+  # ==========================================================================
+  # Build
+  # ==========================================================================
+
   - stage: Build
-    displayName: 'Build Angular UI'
+    displayName: Build Angular UI
+
     jobs:
-      - job: Build
-        displayName: 'Install, test, and build'
+      - job: BuildUi
+        displayName: Build and package Angular UI
+
         steps:
+          - checkout: self
+            clean: true
+
           - task: NodeTool@0
-            displayName: 'Install Node.js'
+            displayName: Install Node.js
             inputs:
               versionSpec: '$(nodeVersion)'
 
           - script: |
-              npm install
-            displayName: 'Install dependencies'
-            workingDirectory: '$(uiProjectRoot)'
+              node --version
+              npm --version
+            displayName: Show Node.js environment
+
+          - script: |
+              npm ci
+            displayName: Install dependencies
+            workingDirectory: '$(uiProjectDirectory)'
 
           - script: |
               npm run build -- --configuration production
-            displayName: 'Build Angular app'
-            workingDirectory: '$(uiProjectRoot)'
+            displayName: Build Angular application
+            workingDirectory: '$(uiProjectDirectory)'
 
           - script: |
-              echo "Inspect dist output"
-              find $(uiProjectRoot)/dist -maxdepth 3 -type f | sort
-            displayName: 'Inspect build output'
+              set -euo pipefail
 
-          - script: |
-              mkdir -p $(Build.ArtifactStagingDirectory)/ui
-              cp -r $(uiProjectRoot)/dist/blast-planning-ui/browser/* $(Build.ArtifactStagingDirectory)/ui/
-              cd $(Build.ArtifactStagingDirectory)/ui
-              zip -r ../ui.zip .
-            displayName: 'Package UI'
+              echo "Checking Angular build output:"
+              echo "$(uiBuildOutput)"
 
-          - publish: '$(Build.ArtifactStagingDirectory)/ui.zip'
-            displayName: 'Publish UI artifact'
-            artifact: 'drop'
+              if [ ! -d "$(uiBuildOutput)" ]; then
+                echo "Angular build output directory was not found."
+                echo "Available dist contents:"
+
+                find "$(Build.SourcesDirectory)/src/frontend/blast-planning-ui/dist" \
+                  -maxdepth 4 \
+                  -type d \
+                  -print || true
+
+                exit 1
+              fi
+
+              echo "Angular build output:"
+              find "$(uiBuildOutput)" \
+                -maxdepth 2 \
+                -type f \
+                -print
+            displayName: Verify Angular build output
+
+          - task: ArchiveFiles@2
+            displayName: Package Angular UI
+            inputs:
+              rootFolderOrFile: '$(uiBuildOutput)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(uiPackagePath)'
+              replaceExistingArchive: true
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish UI artifact
+            inputs:
+              targetPath: '$(uiPackagePath)'
+              artifact: ui
+              publishLocation: pipeline
+
+  # ==========================================================================
+  # Deploy
+  # ==========================================================================
 
   - stage: Deploy
-    displayName: 'Deploy UI to Dev'
+    displayName: Deploy Angular UI
     dependsOn: Build
     condition: succeeded()
+
     jobs:
-      - deployment: DeployDevUi
-        displayName: 'Deploy Angular UI'
-        environment: 'esr-dev'
+      - deployment: DeployUi
+        displayName: Deploy Blast Planning UI
+        environment: 'event-sourcing-dev'
+
         strategy:
           runOnce:
             deploy:
               steps:
-                - download: current
-                  artifact: 'drop'
+                - checkout: none
+
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download UI artifact
+                  inputs:
+                    artifactName: ui
+                    targetPath: '$(Pipeline.Workspace)/ui'
 
                 - task: AzureWebApp@1
-                  displayName: 'Deploy UI App Service'
+                  displayName: Deploy UI to Linux App Service
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
-                    appType: 'webApp'
+                    appType: webAppLinux
                     appName: '$(uiAppName)'
-                    package: '$(Pipeline.Workspace)/drop/ui.zip'
-                    deploymentMethod: 'runFromPackage'
+                    package: '$(Pipeline.Workspace)/ui/ui.zip'
+                    deploymentMethod: zipDeploy
+
+  # ==========================================================================
+  # Verify
+  # ==========================================================================
+
+  - stage: Verify
+    displayName: Verify UI deployment
+    dependsOn: Deploy
+    condition: succeeded()
+
+    jobs:
+      - job: VerifyUi
+        displayName: Verify UI App Service
+
+        steps:
+          - checkout: none
+
+          - task: AzureCLI@2
+            displayName: Check UI App Service
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+
+                az webapp show \
+                  --name "$(uiAppName)" \
+                  --resource-group "rg-event-sourcing-dev" \
+                  --output table

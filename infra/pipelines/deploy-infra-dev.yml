@@ -1,101 +1,217 @@
+name: deploy-event-sourcing-infra-dev-$(Date:yyyyMMdd)-$(Rev:r)
+
 trigger: none
 
 pr: none
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
   azureServiceConnection: 'sc-esr-dev'
-  resourceGroupName: 'rg-esr-dev-platform'
-  location: 'australiaeast'
+
   templateFile: 'infra/bicep/environments/dev/main.bicep'
-  parametersFile: 'infra/bicep/environments/dev/main.dev.bicepparam'
+  parameterFile: 'infra/bicep/environments/dev/main.dev.bicepparam'
+
+  deploymentLocation: 'australiaeast'
+  applicationResourceGroupName: 'rg-event-sourcing-dev'
 
 stages:
-  - stage: Validate
-    displayName: 'Validate Infrastructure'
+  # ==========================================================================
+  # Build
+  # ==========================================================================
+
+  - stage: Build
+    displayName: Build Bicep
+
     jobs:
-      - job: Validate
-        displayName: 'Build and validate Bicep'
+      - job: BuildBicep
+        displayName: Build and lint Bicep
+
         steps:
-          - task: AzureCLI@2
-            displayName: 'Bicep build'
-            inputs:
-              azureSubscription: '$(azureServiceConnection)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
-              inlineScript: |
-                az bicep build --file $(templateFile)
+          - checkout: self
+            clean: true
 
           - task: AzureCLI@2
-            displayName: 'ARM validation'
+            displayName: Build Bicep template
             inputs:
               azureSubscription: '$(azureServiceConnection)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
+              scriptType: bash
+              scriptLocation: inlineScript
               inlineScript: |
-                az deployment group validate \
-                  --resource-group $(resourceGroupName) \
-                  --template-file $(templateFile) \
-                  --parameters $(parametersFile) 
-            env:    
-              SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
+                set -euo pipefail
+
+                echo "Azure CLI version:"
+                az version --output table
+
+                echo "Installing/updating Bicep CLI..."
+                az bicep install
+
+                echo "Bicep version:"
+                az bicep version
+
+                echo "Building $(templateFile)..."
+                az bicep build \
+                  --file "$(templateFile)" \
+                  --stdout > /dev/null
+
+                echo "Bicep build completed successfully."
+
+  # ==========================================================================
+  # Validate
+  # ==========================================================================
+
+  - stage: Validate
+    displayName: Validate subscription deployment
+    dependsOn: Build
+    condition: succeeded()
+
+    jobs:
+      - job: ValidateDeployment
+        displayName: Validate infrastructure
+
+        steps:
+          - checkout: self
+            clean: true
+
+          - task: AzureCLI@2
+            displayName: Validate Bicep deployment
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+
+                deployment_name="event-sourcing-dev-validate-$(Build.BuildId)"
+
+                echo "Validating subscription deployment:"
+                echo "  Name:       $deployment_name"
+                echo "  Location:   $(deploymentLocation)"
+                echo "  Template:   $(templateFile)"
+                echo "  Parameters: $(parameterFile)"
+
+                az deployment sub validate \
+                  --name "$deployment_name" \
+                  --location "$(deploymentLocation)" \
+                  --template-file "$(templateFile)" \
+                  --parameters "$(parameterFile)" \
+                  --output none
+
+                echo "Validation completed successfully."
+            env:
               COSMOS_CONNECTION_STRING: $(CosmosConnectionString)
               SQL_CONNECTION_STRING: $(SqlConnectionString)
               SERVICEBUS_CONNECTION_STRING: $(ServiceBusConnectionString)
+
+  # ==========================================================================
+  # What-If
+  # ==========================================================================
 
   - stage: WhatIf
-    displayName: 'What-If'
+    displayName: Preview infrastructure changes
     dependsOn: Validate
+    condition: succeeded()
+
     jobs:
-      - job: WhatIf
-        displayName: 'Preview infrastructure changes'
+      - job: PreviewDeployment
+        displayName: Run Bicep What-If
+
         steps:
+          - checkout: self
+            clean: true
+
           - task: AzureCLI@2
-            displayName: 'Run what-if'
+            displayName: Preview subscription deployment
             inputs:
               azureSubscription: '$(azureServiceConnection)'
-              scriptType: 'bash'
-              scriptLocation: 'inlineScript'
+              scriptType: bash
+              scriptLocation: inlineScript
               inlineScript: |
-                az deployment group what-if \
-                  --resource-group $(resourceGroupName) \
-                  --template-file $(templateFile) \
-                  --parameters $(parametersFile) 
-            env:    
-              SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
+                set -euo pipefail
+
+                deployment_name="event-sourcing-dev-whatif-$(Build.BuildId)"
+
+                echo "Previewing subscription deployment changes..."
+
+                az deployment sub what-if \
+                  --name "$deployment_name" \
+                  --location "$(deploymentLocation)" \
+                  --template-file "$(templateFile)" \
+                  --parameters "$(parameterFile)" \
+                  --result-format ResourceIdOnly
+            env:
               COSMOS_CONNECTION_STRING: $(CosmosConnectionString)
               SQL_CONNECTION_STRING: $(SqlConnectionString)
               SERVICEBUS_CONNECTION_STRING: $(ServiceBusConnectionString)
 
+  # ==========================================================================
+  # Deploy
+  # ==========================================================================
+
   - stage: Deploy
-    displayName: 'Deploy Infrastructure'
+    displayName: Deploy Event Sourcing infrastructure
     dependsOn: WhatIf
     condition: succeeded()
+
     jobs:
-      - deployment: DeployDevInfrastructure
-        displayName: 'Deploy dev infrastructure'
-        environment: 'esr-dev'
+      - deployment: DeployInfrastructure
+        displayName: Deploy infrastructure
+        environment: 'event-sourcing-dev'
+
         strategy:
           runOnce:
             deploy:
               steps:
                 - checkout: self
+                  clean: true
+
                 - task: AzureCLI@2
-                  displayName: 'Deploy Bicep'
+                  displayName: Deploy Bicep infrastructure
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
-                    scriptType: 'bash'
-                    scriptLocation: 'inlineScript'
+                    scriptType: bash
+                    scriptLocation: inlineScript
                     inlineScript: |
-                      az deployment group create \
-                        --name deploy-esr-dev-infra-$(Build.BuildId) \
-                        --resource-group $(resourceGroupName) \
-                        --template-file $(templateFile) \
-                        --parameters $(parametersFile) 
-                  env:    
-                    SQL_ADMIN_PASSWORD: $(SqlAdministratorLoginPassword) # Maps the secret variable to an env variable
+                      set -euo pipefail
+
+                      deployment_name="event-sourcing-dev-$(Build.BuildId)"
+
+                      echo "Deploying Event Sourcing infrastructure:"
+
+                      az deployment sub create \
+                        --name "$deployment_name" \
+                        --location "$(deploymentLocation)" \
+                        --template-file "$(templateFile)" \
+                        --parameters "$(parameterFile)" \
+                        --output none
+
+                      echo "Subscription deployment completed successfully."
+
+                      echo "Deployment result:"
+                      az deployment sub show \
+                        --name "$deployment_name" \
+                        --output table
+                  env:
                     COSMOS_CONNECTION_STRING: $(CosmosConnectionString)
                     SQL_CONNECTION_STRING: $(SqlConnectionString)
                     SERVICEBUS_CONNECTION_STRING: $(ServiceBusConnectionString)
+
+                - task: AzureCLI@2
+                  displayName: Verify Event Sourcing resources
+                  inputs:
+                    azureSubscription: '$(azureServiceConnection)'
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+
+                      echo "Application resource group:"
+                      az group show \
+                        --name "$(applicationResourceGroupName)" \
+                        --output table
+
+                      echo "Application-owned resources:"
+                      az resource list \
+                        --resource-group "$(applicationResourceGroupName)" \
+                        --output table

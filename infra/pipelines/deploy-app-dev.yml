@@ -1,114 +1,295 @@
+name: deploy-event-sourcing-app-dev-$(Date:yyyyMMdd)-$(Rev:r)
+
 trigger: none
 
 pr: none
 
 pool:
-  vmImage: 'ubuntu-latest'
+  vmImage: ubuntu-latest
 
 variables:
-  buildConfiguration: 'Release'
   azureServiceConnection: 'sc-esr-dev'
 
+  buildConfiguration: 'Release'
+  dotnetSdkVersion: '10.x'
+
+  applicationTestsProject: 'tests/BlastPlanning.Application.Tests/BlastPlanning.Application.Tests.csproj'
+  domainTestsProject: 'tests/BlastPlanning.Domain.Tests/BlastPlanning.Domain.Tests.csproj'
+  
   apiProject: 'src/backend/services/blast-planning/BlastPlanning.Api/BlastPlanning.Api.csproj'
   workerProject: 'src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj'
 
-  apiAppName: 'esr-dev-api'
+  apiAppName: 'api-adt-blastplanning-dev'
+  workerAppName: 'worker-adt-blastplanning-dev'
+
+  webJobName: 'BlastPlanning.ProjectionWorker'
+
+  apiPublishDirectory: '$(Build.ArtifactStagingDirectory)/api/publish'
+  apiPackagePath: '$(Build.ArtifactStagingDirectory)/api/api.zip'
+
+  workerPublishDirectory: '$(Build.ArtifactStagingDirectory)/worker/publish'
+  workerPackageRoot: '$(Build.ArtifactStagingDirectory)/worker/package'
+  workerPackagePath: '$(Build.ArtifactStagingDirectory)/worker/worker.zip'
 
 stages:
+
+  # ==========================================================================
+  # Build and test
+  # ==========================================================================
+
   - stage: Build
-    displayName: 'Build and Test'
+    displayName: Build and test
+
     jobs:
-      - job: Build
-        displayName: 'Build, test, and publish'
+      - job: BuildApplications
+        displayName: Build API and projection worker
+
         steps:
+          - checkout: self
+            clean: true
+
           - task: UseDotNet@2
-            displayName: 'Install .NET SDK'
+            displayName: Install .NET SDK
             inputs:
-              packageType: 'sdk'
-              version: '10.x'
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Restore'
-            inputs:
-              command: 'restore'
-              projects: '**/**/*.slnx'
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Build'
-            inputs:
-              command: 'build'
-              projects: '**/**/*.slnx'
-              arguments: '--configuration $(buildConfiguration) --no-restore'
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Run unit tests'
-            inputs:
-              command: 'test'
-              projects: |
-                tests/BlastPlanning.Domain.Tests/*.csproj
-                tests/BlastPlanning.Application.Tests/*.csproj
-              arguments: '--configuration $(buildConfiguration) --no-build --logger trx'
-              publishTestResults: true
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Publish API'
-            inputs:
-              command: 'publish'
-              publishWebProjects: false
-              projects: '$(apiProject)'
-              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/api-temp'
-              zipAfterPublish: false
-              modifyOutputPath: false
-
-          - task: DotNetCoreCLI@2
-            displayName: 'Publish Projection Worker'
-            inputs:
-              command: 'publish'
-              publishWebProjects: false
-              projects: '$(workerProject)'
-              arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/worker-temp'
-              zipAfterPublish: false
-              modifyOutputPath: false
+              packageType: sdk
+              version: '$(dotnetSdkVersion)'
 
           - script: |
-              echo "API publish output:"
-              find $(Build.ArtifactStagingDirectory)/api-temp -maxdepth 2 -type f | sort
-
-              echo "Worker publish output:"
-              find $(Build.ArtifactStagingDirectory)/worker-temp -maxdepth 2 -type f | sort
-            displayName: 'Inspect publish output'
+              dotnet --info
+            displayName: Show .NET environment
 
           - script: |
-              mkdir -p $(Build.ArtifactStagingDirectory)/api-temp/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker
-              cp -r $(Build.ArtifactStagingDirectory)/worker-temp/* $(Build.ArtifactStagingDirectory)/api-temp/App_Data/jobs/continuous/BlastPlanning.ProjectionWorker/
-              cd $(Build.ArtifactStagingDirectory)/api-temp
-              zip -r ../api-with-webjob.zip .
-            displayName: 'Package API with continuous WebJob'
+              dotnet restore "$(apiProject)"
+              dotnet restore "$(workerProject)"
+            displayName: Restore dependencies
 
-          - publish: '$(Build.ArtifactStagingDirectory)/api-with-webjob.zip'
-            displayName: 'Publish deployment artifact'
-            artifact: 'drop'
+          - script: |
+              dotnet build "$(apiProject)" \
+                --configuration "$(buildConfiguration)" \
+                --no-restore
 
-  - stage: Deploy
-    displayName: 'Deploy to Dev'
+              dotnet build "$(workerProject)" \
+                --configuration "$(buildConfiguration)" \
+                --no-restore
+            displayName: Build applications
+
+          - script: |
+              set -euo pipefail
+          
+              dotnet test "$(applicationTestsProject)" \
+                --configuration "$(buildConfiguration)" \
+                --logger "trx" \
+                --results-directory "$(Agent.TempDirectory)/TestResults"
+          
+              dotnet test "$(domainTestsProject)" \
+                --configuration "$(buildConfiguration)" \
+                --logger "trx" \
+                --results-directory "$(Agent.TempDirectory)/TestResults"
+          
+            displayName: Run Application and Domain tests
+
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: '$(Agent.TempDirectory)/TestResults/**/*.trx'
+              failTaskOnFailedTests: true
+
+          # ------------------------------------------------------------------
+          # Publish API
+          # ------------------------------------------------------------------
+
+          - script: |
+              set -euo pipefail
+
+              rm -rf "$(apiPublishDirectory)"
+              mkdir -p "$(apiPublishDirectory)"
+
+              dotnet publish "$(apiProject)" \
+                --configuration "$(buildConfiguration)" \
+                --no-restore \
+                --output "$(apiPublishDirectory)"
+            displayName: Publish API
+
+          - task: ArchiveFiles@2
+            displayName: Package API
+            inputs:
+              rootFolderOrFile: '$(apiPublishDirectory)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(apiPackagePath)'
+              replaceExistingArchive: true
+
+          # ------------------------------------------------------------------
+          # Publish projection worker as continuous WebJob
+          # ------------------------------------------------------------------
+
+          - script: |
+              set -euo pipefail
+
+              rm -rf "$(workerPublishDirectory)"
+              rm -rf "$(workerPackageRoot)"
+
+              mkdir -p "$(workerPublishDirectory)"
+
+              dotnet publish "$(workerProject)" \
+                --configuration "$(buildConfiguration)" \
+                --no-restore \
+                --output "$(workerPublishDirectory)"
+
+              webjob_directory="$(workerPackageRoot)/App_Data/jobs/continuous/$(webJobName)"
+
+              mkdir -p "$webjob_directory"
+
+              cp -R "$(workerPublishDirectory)/." "$webjob_directory/"
+
+              cat > "$webjob_directory/run.sh" <<'EOF'
+              #!/usr/bin/env bash
+              set -e
+
+              cd "$(dirname "$0")"
+              exec dotnet BlastPlanning.ProjectionWorker.dll
+              EOF
+
+              chmod +x "$webjob_directory/run.sh"
+
+              echo "WebJob package contents:"
+              find "$(workerPackageRoot)" -maxdepth 6 -type f | sort
+            displayName: Prepare continuous WebJob
+
+          - task: ArchiveFiles@2
+            displayName: Package projection WebJob
+            inputs:
+              rootFolderOrFile: '$(workerPackageRoot)'
+              includeRootFolder: false
+              archiveType: zip
+              archiveFile: '$(workerPackagePath)'
+              replaceExistingArchive: true
+
+          # ------------------------------------------------------------------
+          # Publish pipeline artifacts
+          # ------------------------------------------------------------------
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish API artifact
+            inputs:
+              targetPath: '$(apiPackagePath)'
+              artifact: api
+              publishLocation: pipeline
+
+          - task: PublishPipelineArtifact@1
+            displayName: Publish worker artifact
+            inputs:
+              targetPath: '$(workerPackagePath)'
+              artifact: worker
+              publishLocation: pipeline
+
+  # ==========================================================================
+  # Deploy API
+  # ==========================================================================
+
+  - stage: DeployApi
+    displayName: Deploy API
     dependsOn: Build
     condition: succeeded()
+
     jobs:
-      - deployment: DeployDevApps
-        displayName: 'Deploy API with WebJob'
-        environment: 'esr-dev'
+      - deployment: DeployApiApplication
+        displayName: Deploy Blast Planning API
+        environment: 'event-sourcing-dev'
+
         strategy:
           runOnce:
             deploy:
               steps:
-                - download: current
-                  artifact: 'drop'
+                - checkout: none
+
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download API artifact
+                  inputs:
+                    artifactName: api
+                    targetPath: '$(Pipeline.Workspace)/api'
 
                 - task: AzureWebApp@1
-                  displayName: 'Deploy API with Projection Worker WebJob'
+                  displayName: Deploy API to Linux App Service
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
-                    appType: 'webApp'
+                    appType: webAppLinux
                     appName: '$(apiAppName)'
-                    package: '$(Pipeline.Workspace)/drop/api-with-webjob.zip'
-                    deploymentMethod: 'zipDeploy'
+                    package: '$(Pipeline.Workspace)/api/api.zip'
+                    deploymentMethod: zipDeploy
+
+  # ==========================================================================
+  # Deploy projection worker
+  # ==========================================================================
+
+  - stage: DeployWorker
+    displayName: Deploy projection worker
+    dependsOn: DeployApi
+    condition: succeeded()
+
+    jobs:
+      - deployment: DeployProjectionWorker
+        displayName: Deploy projection WebJob
+        environment: 'event-sourcing-dev'
+
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: none
+
+                - task: DownloadPipelineArtifact@2
+                  displayName: Download worker artifact
+                  inputs:
+                    artifactName: worker
+                    targetPath: '$(Pipeline.Workspace)/worker'
+
+                - task: AzureWebApp@1
+                  displayName: Deploy worker host package
+                  inputs:
+                    azureSubscription: '$(azureServiceConnection)'
+                    appType: webAppLinux
+                    appName: '$(workerAppName)'
+                    package: '$(Pipeline.Workspace)/worker/worker.zip'
+                    deploymentMethod: zipDeploy
+
+  # ==========================================================================
+  # Verify
+  # ==========================================================================
+
+  - stage: Verify
+    displayName: Verify deployment
+    dependsOn: DeployWorker
+    condition: succeeded()
+
+    jobs:
+      - job: VerifyApplications
+        displayName: Verify App Services
+
+        steps:
+          - checkout: none
+
+          - task: AzureCLI@2
+            displayName: Verify API and worker hosts
+            inputs:
+              azureSubscription: '$(azureServiceConnection)'
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -euo pipefail
+
+                echo "API App Service:"
+                az webapp show \
+                  --name "$(apiAppName)" \
+                  --resource-group "rg-event-sourcing-dev" \
+                  --query "{name:name,state:state,host:defaultHostName}" \
+                  --output table
+
+                echo "Worker App Service:"
+                az webapp show \
+                  --name "$(workerAppName)" \
+                  --resource-group "rg-event-sourcing-dev" \
+                  --query "{name:name,state:state,host:defaultHostName}" \
+                  --output table
