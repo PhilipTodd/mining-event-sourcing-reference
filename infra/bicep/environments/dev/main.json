@@ -1,11 +1,12 @@
 {
   "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "languageVersion": "2.0",
   "contentVersion": "1.0.0.0",
   "metadata": {
     "_generator": {
       "name": "bicep",
       "version": "0.46.1.21595",
-      "templateHash": "2637473876039616788"
+      "templateHash": "9739224874830741402"
     }
   },
   "parameters": {
@@ -105,10 +106,16 @@
         "description": "Globally unique name of the Blast Planning UI App Service."
       }
     },
-    "workerAppName": {
+    "functionAppName": {
       "type": "string",
       "metadata": {
-        "description": "Globally unique name of the App Service hosting the Projection WebJob."
+        "description": "Globally unique name of the Function app hosting the Projection WebJob."
+      }
+    },
+    "functionStorageAccountName": {
+      "type": "string",
+      "metadata": {
+        "description": "Storage account for Function app."
       }
     },
     "cosmosContainerName": {
@@ -173,15 +180,64 @@
       }
     }
   },
-  "resources": [
-    {
+  "resources": {
+    "applicationResourceGroup": {
       "type": "Microsoft.Resources/resourceGroups",
       "apiVersion": "2024-03-01",
       "name": "[parameters('applicationResourceGroupName')]",
       "location": "[parameters('applicationLocation')]",
       "tags": "[parameters('tags')]"
     },
-    {
+    "sharedAppServicePlan": {
+      "existing": true,
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2024-04-01",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[parameters('appServicePlanName')]"
+    },
+    "sharedApplicationInsights": {
+      "existing": true,
+      "type": "Microsoft.Insights/components",
+      "apiVersion": "2020-02-02",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[parameters('applicationInsightsName')]"
+    },
+    "sharedSqlServer": {
+      "existing": true,
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2023-08-01",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[parameters('sqlServerName')]"
+    },
+    "sharedSqlDatabase": {
+      "existing": true,
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2023-08-01",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[format('{0}/{1}', parameters('sqlServerName'), parameters('sqlDatabaseName'))]"
+    },
+    "sharedCosmosAccount": {
+      "existing": true,
+      "type": "Microsoft.DocumentDB/databaseAccounts",
+      "apiVersion": "2025-10-15",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[parameters('cosmosAccountName')]"
+    },
+    "sharedCosmosDatabase": {
+      "existing": true,
+      "type": "Microsoft.DocumentDB/databaseAccounts/sqlDatabases",
+      "apiVersion": "2025-10-15",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[format('{0}/{1}', parameters('cosmosAccountName'), parameters('cosmosDatabaseName'))]"
+    },
+    "sharedServiceBusNamespace": {
+      "existing": true,
+      "type": "Microsoft.ServiceBus/namespaces",
+      "apiVersion": "2026-01-01",
+      "resourceGroup": "[parameters('platformResourceGroupName')]",
+      "name": "[parameters('serviceBusNamespaceName')]"
+    },
+    "cosmosContainer": {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "blastplanning-cosmos-container",
@@ -311,7 +367,7 @@
         }
       }
     },
-    {
+    "serviceBus": {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "blastplanning-servicebus",
@@ -452,7 +508,7 @@
         }
       }
     },
-    {
+    "appService": {
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
       "name": "blastplanning-appservices",
@@ -475,11 +531,14 @@
           "uiAppName": {
             "value": "[parameters('uiAppName')]"
           },
-          "workerAppName": {
-            "value": "[parameters('workerAppName')]"
+          "functionAppName": {
+            "value": "[parameters('functionAppName')]"
+          },
+          "functionStorageConnectionString": {
+            "value": "[listOutputsWithSecureValues('functionStorage', '2025-04-01').connectionString]"
           },
           "applicationInsightsConnectionString": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Insights/components', parameters('applicationInsightsName')), '2020-02-02').ConnectionString]"
+            "value": "[reference('sharedApplicationInsights').ConnectionString]"
           },
           "cosmosConnectionString": {
             "value": "[parameters('cosmosConnectionString')]"
@@ -488,7 +547,7 @@
             "value": "[parameters('cosmosDatabaseName')]"
           },
           "cosmosContainerName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-cosmos-container'), '2025-04-01').outputs.containerName.value]"
+            "value": "[reference('cosmosContainer').outputs.containerName.value]"
           },
           "sqlConnectionString": {
             "value": "[parameters('sqlConnectionString')]"
@@ -497,10 +556,10 @@
             "value": "[parameters('serviceBusConnectionString')]"
           },
           "serviceBusTopicName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-servicebus'), '2025-04-01').outputs.topicName.value]"
+            "value": "[reference('serviceBus').outputs.topicName.value]"
           },
           "serviceBusSubscriptionName": {
-            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-servicebus'), '2025-04-01').outputs.subscriptionName.value]"
+            "value": "[reference('serviceBus').outputs.subscriptionName.value]"
           },
           "entraTenantId": {
             "value": "[parameters('entraTenantId')]"
@@ -522,7 +581,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.46.1.21595",
-              "templateHash": "9663828863440176250"
+              "templateHash": "1171289185669503315"
             }
           },
           "parameters": {
@@ -557,11 +616,11 @@
                 "description": "Globally unique name of the Blast Planning UI App Service."
               }
             },
-            "workerAppName": {
-              "type": "string",
-              "metadata": {
-                "description": "Globally unique name of the App Service hosting the Projection WebJob."
-              }
+            "functionAppName": {
+              "type": "string"
+            },
+            "functionStorageConnectionString": {
+              "type": "securestring"
             },
             "applicationInsightsConnectionString": {
               "type": "string",
@@ -730,7 +789,7 @@
                   "minTlsVersion": "1.2",
                   "ftpsState": "Disabled",
                   "http20Enabled": true,
-                  "websocketsEnabled": false,
+                  "webSocketsEnabled": false,
                   "appSettings": "[concat(variables('commonBackendAppSettings'), createArray(createObject('name', 'AzureAd__Instance', 'value', 'https://login.microsoftonline.com/'), createObject('name', 'AzureAd__TenantId', 'value', parameters('entraTenantId')), createObject('name', 'AzureAd__ClientId', 'value', parameters('entraApiClientId')), createObject('name', 'AzureAd__Audience', 'value', format('api://{0}', parameters('entraApiClientId')))), variables('corsAppSettings'))]"
                 }
               }
@@ -768,9 +827,9 @@
             {
               "type": "Microsoft.Web/sites",
               "apiVersion": "2024-04-01",
-              "name": "[parameters('workerAppName')]",
+              "name": "[parameters('functionAppName')]",
               "location": "[parameters('location')]",
-              "kind": "app,linux",
+              "kind": "functionapp,linux",
               "tags": "[parameters('tags')]",
               "properties": {
                 "serverFarmId": "[parameters('appServicePlanId')]",
@@ -781,7 +840,52 @@
                   "minTlsVersion": "1.2",
                   "ftpsState": "Disabled",
                   "http20Enabled": true,
-                  "appSettings": "[concat(variables('commonBackendAppSettings'), createArray(createObject('name', 'WEBJOBS_IDLE_TIMEOUT', 'value', '0'), createObject('name', 'WEBSITE_WEBJOBS_STOPPED', 'value', '0'), createObject('name', 'SCM_DO_BUILD_DURING_DEPLOYMENT', 'value', 'false')))]"
+                  "appSettings": [
+                    {
+                      "name": "AzureWebJobsStorage",
+                      "value": "[parameters('functionStorageConnectionString')]"
+                    },
+                    {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~4"
+                    },
+                    {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "dotnet-isolated"
+                    },
+                    {
+                      "name": "WEBSITE_RUN_FROM_PACKAGE",
+                      "value": "1"
+                    },
+                    {
+                      "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                      "value": "[parameters('applicationInsightsConnectionString')]"
+                    },
+                    {
+                      "name": "UseInMemoryEventStore",
+                      "value": "false"
+                    },
+                    {
+                      "name": "UseInMemoryReadModels",
+                      "value": "false"
+                    },
+                    {
+                      "name": "Sql__ConnectionString",
+                      "value": "[parameters('sqlConnectionString')]"
+                    },
+                    {
+                      "name": "ServiceBus__ConnectionString",
+                      "value": "[parameters('serviceBusConnectionString')]"
+                    },
+                    {
+                      "name": "ServiceBus__TopicName",
+                      "value": "[parameters('serviceBusTopicName')]"
+                    },
+                    {
+                      "name": "ServiceBus__SubscriptionName",
+                      "value": "[parameters('serviceBusSubscriptionName')]"
+                    }
+                  ]
                 }
               }
             }
@@ -811,28 +915,112 @@
               "type": "string",
               "value": "[reference(resourceId('Microsoft.Web/sites', parameters('uiAppName')), '2024-04-01').defaultHostName]"
             },
-            "workerAppId": {
+            "functionAppId": {
               "type": "string",
-              "value": "[resourceId('Microsoft.Web/sites', parameters('workerAppName'))]"
+              "value": "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
             },
-            "workerAppName": {
+            "functionAppName": {
               "type": "string",
-              "value": "[parameters('workerAppName')]"
+              "value": "[parameters('functionAppName')]"
             },
-            "workerAppDefaultHostName": {
+            "functionAppDefaultHostName": {
               "type": "string",
-              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('workerAppName')), '2024-04-01').defaultHostName]"
+              "value": "[reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2024-04-01').defaultHostName]"
             }
           }
         }
       },
       "dependsOn": [
-        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', parameters('applicationResourceGroupName'))]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-cosmos-container')]",
-        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-servicebus')]"
+        "applicationResourceGroup",
+        "cosmosContainer",
+        "functionStorage",
+        "serviceBus",
+        "sharedApplicationInsights"
+      ]
+    },
+    "functionStorage": {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2025-04-01",
+      "name": "blastplanning-function-storage",
+      "resourceGroup": "[parameters('applicationResourceGroupName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "storageAccountName": {
+            "value": "[parameters('functionStorageAccountName')]"
+          },
+          "location": {
+            "value": "[parameters('applicationLocation')]"
+          },
+          "tags": {
+            "value": "[parameters('tags')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "languageVersion": "2.0",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.46.1.21595",
+              "templateHash": "16526318021514378279"
+            }
+          },
+          "parameters": {
+            "storageAccountName": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            },
+            "tags": {
+              "type": "object",
+              "defaultValue": {}
+            }
+          },
+          "resources": {
+            "storageAccount": {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2025-06-01",
+              "name": "[parameters('storageAccountName')]",
+              "location": "[parameters('location')]",
+              "tags": "[parameters('tags')]",
+              "sku": {
+                "name": "Standard_LRS"
+              },
+              "kind": "StorageV2",
+              "properties": {
+                "minimumTlsVersion": "TLS1_2",
+                "allowBlobPublicAccess": false,
+                "supportsHttpsTrafficOnly": true
+              }
+            }
+          },
+          "outputs": {
+            "storageAccountName": {
+              "type": "string",
+              "value": "[parameters('storageAccountName')]"
+            },
+            "storageAccountId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+            },
+            "connectionString": {
+              "type": "securestring",
+              "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix={2}', parameters('storageAccountName'), listKeys('storageAccount', '2025-06-01').keys[0].value, environment().suffixes.storage)]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "applicationResourceGroup"
       ]
     }
-  ],
+  },
   "outputs": {
     "applicationResourceGroupName": {
       "type": "string",
@@ -868,7 +1056,7 @@
     },
     "cosmosContainerName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-cosmos-container'), '2025-04-01').outputs.containerName.value]"
+      "value": "[reference('cosmosContainer').outputs.containerName.value]"
     },
     "sharedServiceBusNamespaceName": {
       "type": "string",
@@ -876,35 +1064,35 @@
     },
     "serviceBusTopicName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-servicebus'), '2025-04-01').outputs.topicName.value]"
+      "value": "[reference('serviceBus').outputs.topicName.value]"
     },
     "serviceBusSubscriptionName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('platformResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-servicebus'), '2025-04-01').outputs.subscriptionName.value]"
+      "value": "[reference('serviceBus').outputs.subscriptionName.value]"
     },
     "apiAppName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('applicationResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-appservices'), '2025-04-01').outputs.apiAppName.value]"
+      "value": "[reference('appService').outputs.apiAppName.value]"
     },
     "apiAppDefaultHostName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('applicationResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-appservices'), '2025-04-01').outputs.apiAppDefaultHostName.value]"
+      "value": "[reference('appService').outputs.apiAppDefaultHostName.value]"
     },
     "uiAppName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('applicationResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-appservices'), '2025-04-01').outputs.uiAppName.value]"
+      "value": "[reference('appService').outputs.uiAppName.value]"
     },
     "uiAppDefaultHostName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('applicationResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-appservices'), '2025-04-01').outputs.uiAppDefaultHostName.value]"
+      "value": "[reference('appService').outputs.uiAppDefaultHostName.value]"
     },
-    "workerAppName": {
+    "functionAppName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('applicationResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-appservices'), '2025-04-01').outputs.workerAppName.value]"
+      "value": "[reference('appService').outputs.functionAppName.value]"
     },
-    "workerAppDefaultHostName": {
+    "functionAppDefaultHostName": {
       "type": "string",
-      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, parameters('applicationResourceGroupName')), 'Microsoft.Resources/deployments', 'blastplanning-appservices'), '2025-04-01').outputs.workerAppDefaultHostName.value]"
+      "value": "[reference('appService').outputs.functionAppDefaultHostName.value]"
     }
   }
 }

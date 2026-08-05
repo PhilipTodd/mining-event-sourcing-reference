@@ -17,19 +17,19 @@ variables:
   domainTestsProject: 'tests/BlastPlanning.Domain.Tests/BlastPlanning.Domain.Tests.csproj'
   
   apiProject: 'src/backend/services/blast-planning/BlastPlanning.Api/BlastPlanning.Api.csproj'
-  workerProject: 'src/backend/workers/BlastPlanning.ProjectionWorker/BlastPlanning.ProjectionWorker.csproj'
-
   apiAppName: 'api-adt-blastplanning-dev'
-  workerAppName: 'worker-adt-blastplanning-dev'
-
-  webJobName: 'BlastPlanning.ProjectionWorker'
-
   apiPublishDirectory: '$(Build.ArtifactStagingDirectory)/api/publish'
   apiPackagePath: '$(Build.ArtifactStagingDirectory)/api/api.zip'
+  
+  functionProject: 'src/backend/functions/BlastPlanning.ProjectionFunction/BlastPlanning.ProjectionFunction.csproj'
+  functionAppName: 'func-adt-blastplanning-dev'
+  functionPublishDirectory: '$(Build.ArtifactStagingDirectory)/function/publish'
+  functionPackagePath: '$(Build.ArtifactStagingDirectory)/function/function.zip'
 
-  workerPublishDirectory: '$(Build.ArtifactStagingDirectory)/worker/publish'
-  workerPackageRoot: '$(Build.ArtifactStagingDirectory)/worker/package'
-  workerPackagePath: '$(Build.ArtifactStagingDirectory)/worker/worker.zip'
+
+  # workerPublishDirectory: '$(Build.ArtifactStagingDirectory)/worker/publish'
+  # workerPackageRoot: '$(Build.ArtifactStagingDirectory)/worker/package'
+  # workerPackagePath: '$(Build.ArtifactStagingDirectory)/worker/worker.zip'
 
 stages:
 
@@ -60,7 +60,7 @@ stages:
 
           - script: |
               dotnet restore "$(apiProject)"
-              dotnet restore "$(workerProject)"
+              dotnet restore "$(functionProject)"
             displayName: Restore dependencies
 
           - script: |
@@ -68,7 +68,7 @@ stages:
                 --configuration "$(buildConfiguration)" \
                 --no-restore
 
-              dotnet build "$(workerProject)" \
+              dotnet build "$(functionProject)" \
                 --configuration "$(buildConfiguration)" \
                 --no-restore
             displayName: Build applications
@@ -128,43 +128,22 @@ stages:
           - script: |
               set -euo pipefail
 
-              rm -rf "$(workerPublishDirectory)"
-              rm -rf "$(workerPackageRoot)"
+              rm -rf "$(functionPublishDirectory)"
+              mkdir -p "$(functionPublishDirectory)"
 
-              mkdir -p "$(workerPublishDirectory)"
-
-              dotnet publish "$(workerProject)" \
+              dotnet publish "$(functionProject)" \
                 --configuration "$(buildConfiguration)" \
                 --no-restore \
-                --output "$(workerPublishDirectory)"
-
-              webjob_directory="$(workerPackageRoot)/App_Data/jobs/continuous/$(webJobName)"
-
-              mkdir -p "$webjob_directory"
-
-              cp -R "$(workerPublishDirectory)/." "$webjob_directory/"
-
-              cat > "$webjob_directory/run.sh" <<'EOF'
-              #!/usr/bin/env bash
-              set -e
-
-              cd "$(dirname "$0")"
-              exec dotnet BlastPlanning.ProjectionWorker.dll
-              EOF
-
-              chmod +x "$webjob_directory/run.sh"
-
-              echo "WebJob package contents:"
-              find "$(workerPackageRoot)" -maxdepth 6 -type f | sort
-            displayName: Prepare continuous WebJob
+                --output "$(functionPublishDirectory)"
+            displayName: Publish projection Function
 
           - task: ArchiveFiles@2
-            displayName: Package projection WebJob
+            displayName: Package projection Function
             inputs:
-              rootFolderOrFile: '$(workerPackageRoot)'
+              rootFolderOrFile: '$(functionPublishDirectory)'
               includeRootFolder: false
               archiveType: zip
-              archiveFile: '$(workerPackagePath)'
+              archiveFile: '$(functionPackagePath)'
               replaceExistingArchive: true
 
           # ------------------------------------------------------------------
@@ -179,10 +158,10 @@ stages:
               publishLocation: pipeline
 
           - task: PublishPipelineArtifact@1
-            displayName: Publish worker artifact
+            displayName: Publish Function artifact
             inputs:
-              targetPath: '$(workerPackagePath)'
-              artifact: worker
+              targetPath: '$(functionPackagePath)'
+              artifact: function
               publishLocation: pipeline
 
   # ==========================================================================
@@ -224,14 +203,14 @@ stages:
   # Deploy projection worker
   # ==========================================================================
 
-  - stage: DeployWorker
-    displayName: Deploy projection worker
+  - stage: DeployFunction
+    displayName: Deploy projection Function
     dependsOn: DeployApi
     condition: succeeded()
 
     jobs:
-      - deployment: DeployProjectionWorker
-        displayName: Deploy projection WebJob
+      - deployment: DeployProjectionFunction
+        displayName: Deploy projection Function
         environment: 'event-sourcing-dev'
 
         strategy:
@@ -241,18 +220,18 @@ stages:
                 - checkout: none
 
                 - task: DownloadPipelineArtifact@2
-                  displayName: Download worker artifact
+                  displayName: Download Function artifact
                   inputs:
-                    artifactName: worker
-                    targetPath: '$(Pipeline.Workspace)/worker'
+                    artifactName: function
+                    targetPath: '$(Pipeline.Workspace)/function'
 
-                - task: AzureWebApp@1
-                  displayName: Deploy worker host package
+                - task: AzureFunctionApp@2
+                  displayName: Deploy Function App
                   inputs:
                     azureSubscription: '$(azureServiceConnection)'
-                    appType: webAppLinux
-                    appName: '$(workerAppName)'
-                    package: '$(Pipeline.Workspace)/worker/worker.zip'
+                    appType: functionAppLinux
+                    appName: '$(functionAppName)'
+                    package: '$(Pipeline.Workspace)/function/function.zip'
                     deploymentMethod: zipDeploy
 
   # ==========================================================================
@@ -261,7 +240,7 @@ stages:
 
   - stage: Verify
     displayName: Verify deployment
-    dependsOn: DeployWorker
+    dependsOn: DeployFunction
     condition: succeeded()
 
     jobs:
@@ -287,9 +266,9 @@ stages:
                   --query "{name:name,state:state,host:defaultHostName}" \
                   --output table
 
-                echo "Worker App Service:"
+                echo "Function app:"
                 az webapp show \
-                  --name "$(workerAppName)" \
+                  --name "$(functionAppName)" \
                   --resource-group "rg-event-sourcing-dev" \
                   --query "{name:name,state:state,host:defaultHostName}" \
                   --output table

@@ -23,8 +23,14 @@ param apiAppName string
 @description('Globally unique name of the Blast Planning UI App Service.')
 param uiAppName string
 
-@description('Globally unique name of the App Service hosting the Projection WebJob.')
-param workerAppName string
+// ============================================================================
+// Function apps
+// ============================================================================
+
+param functionAppName string
+
+@secure()
+param functionStorageConnectionString string
 
 // ============================================================================
 // Monitoring
@@ -257,17 +263,17 @@ resource uiApp 'Microsoft.Web/sites@2024-04-01' = {
 }
 
 // ============================================================================
-// Projection WebJob host
+// Projection Function app
 //
-// This App Service remains the host for the existing continuous WebJob.
+// This Function app is repossible for projections. It is hosted within an App Service Plan.
 // The application deployment pipeline remains responsible for deploying the
-// WebJob package beneath App_Data/jobs/continuous.
+// Function app.
 // ============================================================================
 
-resource workerApp 'Microsoft.Web/sites@2024-04-01' = {
-  name: workerAppName
+resource projectionFunctionApp 'Microsoft.Web/sites@2024-04-01' = {
+  name: functionAppName
   location: location
-  kind: 'app,linux'
+  kind: 'functionapp,linux'
   tags: tags
 
   properties: {
@@ -277,28 +283,56 @@ resource workerApp 'Microsoft.Web/sites@2024-04-01' = {
     siteConfig: {
       linuxFxVersion: dotnetLinuxFxVersion
       alwaysOn: true
-
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
       http20Enabled: true
 
-      appSettings: concat(
-        commonBackendAppSettings,
-        [
-          {
-            name: 'WEBJOBS_IDLE_TIMEOUT'
-            value: '0'
-          }
-          {
-            name: 'WEBSITE_WEBJOBS_STOPPED'
-            value: '0'
-          }
-          {
-            name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-            value: 'false'
-          }
-        ]
-      )
+      appSettings: [
+        {
+          name: 'AzureWebJobsStorage'
+          value: functionStorageConnectionString
+        }
+        {
+          name: 'FUNCTIONS_EXTENSION_VERSION'
+          value: '~4'
+        }
+        {
+          name: 'FUNCTIONS_WORKER_RUNTIME'
+          value: 'dotnet-isolated'
+        }
+        {
+          name: 'WEBSITE_RUN_FROM_PACKAGE'
+          value: '1'
+        }
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: applicationInsightsConnectionString
+        }
+        {
+          name: 'UseInMemoryEventStore'
+          value: 'false'
+        }
+        {
+          name: 'UseInMemoryReadModels'
+          value: 'false'
+        }
+        {
+          name: 'Sql__ConnectionString'
+          value: sqlConnectionString
+        }
+        {
+          name: 'ServiceBus__ConnectionString'
+          value: serviceBusConnectionString
+        }
+        {
+          name: 'ServiceBus__TopicName'
+          value: serviceBusTopicName
+        }
+        {
+          name: 'ServiceBus__SubscriptionName'
+          value: serviceBusSubscriptionName
+        }
+      ]
     }
   }
 }
@@ -315,6 +349,6 @@ output uiAppId string = uiApp.id
 output uiAppName string = uiApp.name
 output uiAppDefaultHostName string = uiApp.properties.defaultHostName
 
-output workerAppId string = workerApp.id
-output workerAppName string = workerApp.name
-output workerAppDefaultHostName string = workerApp.properties.defaultHostName
+output functionAppId string = projectionFunctionApp.id
+output functionAppName string = projectionFunctionApp.name
+output functionAppDefaultHostName string = projectionFunctionApp.properties.defaultHostName

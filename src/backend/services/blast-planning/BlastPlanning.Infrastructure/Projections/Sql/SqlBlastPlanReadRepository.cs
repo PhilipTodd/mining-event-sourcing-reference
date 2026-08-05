@@ -23,7 +23,7 @@ public sealed class SqlBlastPlanReadRepository(
                 Status,
                 CreatedUtc,
                 ApprovedUtc
-            FROM dbo.BlastPlanSummary
+            FROM BlastPlanning.BlastPlanSummary
             WHERE BlastPlanId = @BlastPlanId;
             """;
 
@@ -48,7 +48,7 @@ public sealed class SqlBlastPlanReadRepository(
             Status,
             CreatedUtc,
             ApprovedUtc
-        FROM dbo.BlastPlanSummary
+        FROM BlastPlanning.BlastPlanSummary
         ORDER BY CreatedUtc DESC;
         """;
 
@@ -70,7 +70,7 @@ public sealed class SqlBlastPlanReadRepository(
         CancellationToken cancellationToken = default)
     {
         const string sql = """
-            MERGE dbo.BlastPlanSummary AS target
+            MERGE BlastPlanning.BlastPlanSummary AS target
             USING
             (
                 SELECT
