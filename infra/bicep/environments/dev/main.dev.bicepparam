@@ -43,7 +43,13 @@ param apiAppName = 'api-adt-blastplanning-dev'
 
 param uiAppName = 'web-adt-blastplanning-dev'
 
-param workerAppName = 'worker-adt-blastplanning-dev'
+param functionAppName = 'func-adt-blastplanning-dev'
+
+// ============================================================================
+// Storage
+// ============================================================================
+
+param functionStorageAccountName = 'stadtblastplanningdev'
 
 // ============================================================================
 // Cosmos DB

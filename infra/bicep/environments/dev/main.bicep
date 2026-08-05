@@ -26,9 +26,9 @@ param tags object = {
   capability: 'blastplanning'
 }
 
-// ============================================================================
-// Shared platform resources
-// ============================================================================
+// // ============================================================================
+// // Shared platform resources
+// // ============================================================================
 
 @description('Name of the shared platform resource group.')
 param platformResourceGroupName string
@@ -64,8 +64,15 @@ param apiAppName string
 @description('Globally unique name of the Blast Planning UI App Service.')
 param uiAppName string
 
-@description('Globally unique name of the App Service hosting the Projection WebJob.')
-param workerAppName string
+@description('Globally unique name of the Function app hosting the Projection WebJob.')
+param functionAppName string
+
+// ============================================================================
+// Storage
+// ============================================================================
+
+@description('Storage account for Function app.')
+param functionStorageAccountName string
 
 // ============================================================================
 // Cosmos DB
@@ -214,7 +221,9 @@ module appService '../../modules/appservice.bicep' = {
 
     apiAppName: apiAppName
     uiAppName: uiAppName
-    workerAppName: workerAppName
+    functionAppName: functionAppName
+
+    functionStorageConnectionString: functionStorage.outputs.connectionString
 
     applicationInsightsConnectionString: sharedApplicationInsights.properties.ConnectionString
 
@@ -233,6 +242,21 @@ module appService '../../modules/appservice.bicep' = {
 
     corsAllowedOrigins: corsAllowedOrigins
 
+    tags: tags
+  }
+}
+
+// ============================================================================
+// Storage accounts
+// ============================================================================
+
+module functionStorage '../../modules/storage-account.bicep' = {
+  name: 'blastplanning-function-storage'
+  scope: applicationResourceGroup
+
+  params: {
+    storageAccountName: functionStorageAccountName
+    location: applicationLocation
     tags: tags
   }
 }
@@ -264,5 +288,5 @@ output apiAppDefaultHostName string = appService.outputs.apiAppDefaultHostName
 output uiAppName string = appService.outputs.uiAppName
 output uiAppDefaultHostName string = appService.outputs.uiAppDefaultHostName
 
-output workerAppName string = appService.outputs.workerAppName
-output workerAppDefaultHostName string = appService.outputs.workerAppDefaultHostName
+output functionAppName string = appService.outputs.functionAppName
+output functionAppDefaultHostName string = appService.outputs.functionAppDefaultHostName
