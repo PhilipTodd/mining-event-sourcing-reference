@@ -41,10 +41,10 @@ Example:
 |----------|---------|
 | Azure App Service | Hosts the ASP.NET Core Web API |
 | Azure App Service | Hosts the Angular web application |
-| Azure App Service WebJob | Processes projection events |
+| Azure Function | Processes projection events |
 | Azure Cosmos DB | Event Store |
 | Azure SQL Database | Read model projections |
-| Azure Event Hubs | Event distribution |
+| Azure Service Bus Topics | Event distribution |
 | Azure Blob Storage | Static assets and future archival |
 | Microsoft Entra ID | Authentication |
 | Application Insights | Telemetry |
@@ -73,11 +73,9 @@ infra/
 
 ├── main.bicep
 ├── appservice.bicep
-├── cosmosdb.bicep
-├── sql.bicep
-├── eventhubs.bicep
-├── storage.bicep
-└── appinsights.bicep
+├── cosmoscontainer.bicep
+├── servicebus.bicep
+├── storage-account.bicep
 ```
 
 ---
@@ -106,47 +104,26 @@ Typical deployment flow:
 
 ```text
 Git Commit
-
       │
-
       ▼
-
 Azure DevOps
-
       │
-
       ▼
-
 Build
-
       │
-
       ▼
-
 Unit Tests
-
       │
-
       ▼
-
 Publish Artefacts
-
       │
-
       ▼
-
 Provision Infrastructure
-
       │
-
       ▼
-
 Deploy Application
-
       │
-
       ▼
-
 Health Checks
 ```
 
@@ -173,7 +150,7 @@ Configuration is externalised from the application.
 Examples include:
 
 - Connection strings
-- Event Hub configuration
+- Service Bus configuration
 - Cosmos DB settings
 - SQL configuration
 - Feature flags

@@ -26,7 +26,7 @@ The roadmap below outlines planned enhancements grouped by major milestones.
 - ✅ CQRS implementation
 - ✅ Azure Cosmos DB Event Store
 - ✅ Azure SQL read model projections
-- ✅ Azure Event Hubs integration
+- ✅ Azure Service Bus Topics
 - ✅ ASP.NET Core Web API
 - ✅ Angular web application
 - ✅ Azure App Service deployment
