@@ -96,7 +96,7 @@ Domain Events
 Cosmos DB Event Store
     │
     ▼
-Azure Event Hubs
+Azure Service Bus
     │
     ▼
 Projection Workers
@@ -253,7 +253,7 @@ This reference implementation demonstrates:
 - Domain-driven aggregates
 - Immutable domain events
 - Azure Cosmos DB Event Store
-- Azure Event Hubs integration
+- Azure Service Bus integration
 - Asynchronous projections
 - Azure SQL read models
 - Optimistic concurrency

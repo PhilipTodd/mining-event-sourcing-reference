@@ -37,7 +37,7 @@ The objective of this project is not simply to demonstrate individual technologi
 | Azure App Service | Hosts the Web API and Angular application |
 | Azure Cosmos DB | Event Store |
 | Azure SQL Database | Read Model Projections |
-| Azure Event Hubs | Event distribution |
+| Azure Service Bus Topics | Event distribution |
 | Azure Blob Storage | Static assets and future archival |
 | Application Insights | Application telemetry |
 | Log Analytics | Centralised logging and diagnostics |
@@ -75,16 +75,17 @@ Benefits include:
 
 ## Messaging
 
-Azure Event Hubs distributes committed domain events to downstream consumers.
+Azure Service Bus Topics distribute committed domain events to downstream consumers.
 
-Projection workers consume events asynchronously to build and maintain read models without impacting command processing performance.
+Projection Functions consume events asynchronously to build and maintain SQL read models without impacting command processing performance.
 
 Benefits include:
 
-- Loose coupling
-- Independent scaling
-- Event replay support
-- Event-driven architecture
+- Loose coupling between producers and consumers
+- Independent scaling of event producers and consumers
+- Reliable message delivery with retry and dead-letter support
+- Publish/subscribe event distribution
+- Asynchronous processing
 
 ---
 
@@ -182,9 +183,9 @@ Selected as the Event Store because it supports scalable append-only event strea
 
 Selected for read model projections due to its excellent support for reporting, dashboards and relational queries.
 
-### Azure Event Hubs
+### Azure Service Bus Topics
 
-Provides reliable, asynchronous distribution of committed domain events while allowing projection workers to scale independently.
+Provides reliable distribution of committed domain events while allowing projection workers to scale independently.
 
 ### Microsoft Entra ID
 

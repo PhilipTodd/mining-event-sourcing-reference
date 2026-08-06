@@ -53,7 +53,7 @@ A typical command follows the sequence below.
 4. Aggregate executes business rules.
 5. One or more Domain Events are produced.
 6. Events are persisted to Azure Cosmos DB.
-7. Events are published to Azure Event Hubs.
+7. Events are published to Azure Service Bus Topics.
 8. Projection Workers process new events.
 9. Azure SQL read models are updated.
 10. Queries retrieve optimized read models.
@@ -94,7 +94,7 @@ A typical command follows the sequence below.
                   Event Store
                          │
                          ▼
-                Azure Event Hubs
+                Azure Service Bus
                          │
               Projection Workers
                          │
@@ -118,7 +118,7 @@ A typical command follows the sequence below.
 | Azure App Service | Hosts API and web application |
 | Azure Cosmos DB | Event Store |
 | Azure SQL Database | Read model projections |
-| Azure Event Hubs | Event distribution |
+| Azure Service Bus Topics | Event distribution |
 | Azure Blob Storage | Static assets and future event archival |
 | Microsoft Entra ID | Authentication and authorization |
 | Application Insights | Telemetry |
@@ -146,28 +146,48 @@ Azure Cosmos DB provides scalable storage for immutable event streams while supp
 
 Read models are projected into Azure SQL to support efficient querying, reporting and dashboard scenarios.
 
-### Event Hubs
+### Service Bus
 
-Azure Event Hubs distributes committed events to downstream consumers without tightly coupling projection processing to command execution.
+Azure Service Bus Topics distribute committed events to downstream consumers without tightly coupling projection processing to command execution.
 
 ---
 
 ## Project Structure
 
 ```text
+docs/
+├── architecture
+│   ├── adr
+│   ├── assets
+│   └── decisions
+├── assets
+└── decisions
+│
 src/
-├── Api/
-├── Application/
-├── Domain/
-├── Infrastructure/
-└── ProjectionWorker/
-
+└── Backend
+│   └── building-blocks
+│   │   └── BlastPlanning.Contracts
+│   └── functions
+│   │   └── BlastPlanning.ProjectionFunction
+│   └── services
+│       └── blast-planning
+│           ├── BlastPlanning.Api
+│           ├── BlastPlanning.Application
+│           ├── BlastPlanning.Domain
+│           └── BlastPlanning.Infrastructure
+│
 infra/
-├── bicep/
-
+└── bicep/
+│   └── environments
+│   │   └── dev
+│   └── modules
+└── pipelines
+│
 tests/
-├── UnitTests/
-└── IntegrationTests/
+    ├── Api.Tests/
+    ├── Application.Tests/
+    ├── Domain.Tests/
+    └── Infratructure.Tests/
 ```
 
 ---
