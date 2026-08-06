@@ -324,15 +324,15 @@ resource projectionFunctionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: sqlConnectionString
         }
         {
-          name: 'ServiceBus__ConnectionString'
+          name: 'ServiceBusConnection'
           value: serviceBusConnectionString
         }
         {
-          name: 'ServiceBus__TopicName'
+          name: 'ServiceBusTopicName'
           value: serviceBusTopicName
         }
         {
-          name: 'ServiceBus__SubscriptionName'
+          name: 'ServiceBusSubscriptionName'
           value: serviceBusSubscriptionName
         }
       ]
