@@ -1,7 +1,7 @@
 export const environment = {
   production: true,
 
-  apiBaseUrl: 'https://esr-dev-api.azurewebsites.net',
+  apiBaseUrl: 'https://api-adt-blastplanning-dev.azurewebsites.net',
 
   entra: {
     tenantId: 'f4fcd45c-104f-4dd3-b7bf-3475e83ce097',

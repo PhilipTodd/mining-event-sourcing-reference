@@ -99,8 +99,11 @@ param corsAllowedOrigins array
 @description('ASP.NET Core environment name.')
 param aspNetCoreEnvironment string = 'Development'
 
-@description('Linux runtime used by the .NET applications.')
-param dotnetLinuxFxVersion string = 'DOTNETCORE|10.0'
+@description('Linux runtime used by the ASP.NET Core API.')
+param apiDotnetLinuxFxVersion string = 'DOTNETCORE|10.0'
+
+@description('Linux runtime used by the isolated Azure Function.')
+param functionDotnetLinuxFxVersion string = 'DOTNET-ISOLATED|10.0'
 
 @description('Linux runtime used by the Angular UI host.')
 param nodeLinuxFxVersion string = 'NODE|22-lts'
@@ -187,7 +190,7 @@ resource apiApp 'Microsoft.Web/sites@2024-04-01' = {
     httpsOnly: true
 
     siteConfig: {
-      linuxFxVersion: dotnetLinuxFxVersion
+      linuxFxVersion: apiDotnetLinuxFxVersion
       alwaysOn: true
 
       minTlsVersion: '1.2'
@@ -281,7 +284,7 @@ resource projectionFunctionApp 'Microsoft.Web/sites@2024-04-01' = {
     httpsOnly: true
 
     siteConfig: {
-      linuxFxVersion: dotnetLinuxFxVersion
+      linuxFxVersion: functionDotnetLinuxFxVersion
       alwaysOn: true
       minTlsVersion: '1.2'
       ftpsState: 'Disabled'
@@ -321,15 +324,15 @@ resource projectionFunctionApp 'Microsoft.Web/sites@2024-04-01' = {
           value: sqlConnectionString
         }
         {
-          name: 'ServiceBus__ConnectionString'
+          name: 'ServiceBusConnection'
           value: serviceBusConnectionString
         }
         {
-          name: 'ServiceBus__TopicName'
+          name: 'ServiceBusTopicName'
           value: serviceBusTopicName
         }
         {
-          name: 'ServiceBus__SubscriptionName'
+          name: 'ServiceBusSubscriptionName'
           value: serviceBusSubscriptionName
         }
       ]
