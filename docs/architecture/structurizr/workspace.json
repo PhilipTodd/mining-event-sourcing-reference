@@ -1,0 +1,549 @@
+{
+  "configuration" : {
+    "scope" : "SoftwareSystem"
+  },
+  "description" : "Reference implementation demonstrating CQRS, event sourcing and asynchronous projections on Azure.",
+  "documentation" : { },
+  "id" : 1,
+  "lastModifiedAgent" : "structurizr-ui",
+  "lastModifiedDate" : "2026-08-27T01:16:59Z",
+  "model" : {
+    "people" : [ {
+      "description" : "Uses the Blast Planning application to create, approve and review blast plans.",
+      "id" : "1",
+      "name" : "User",
+      "properties" : {
+        "structurizr.dsl.identifier" : "user"
+      },
+      "relationships" : [ {
+        "description" : "Uses",
+        "destinationId" : "4",
+        "id" : "10",
+        "sourceId" : "1",
+        "tags" : "Relationship",
+        "technology" : "HTTPS"
+      }, {
+        "description" : "Uses",
+        "destinationId" : "3",
+        "id" : "11",
+        "linkedRelationshipId" : "10",
+        "sourceId" : "1",
+        "technology" : "HTTPS"
+      } ],
+      "tags" : "Element,Person"
+    } ],
+    "softwareSystems" : [ {
+      "description" : "Provides authentication and issues access tokens.",
+      "documentation" : { },
+      "id" : "2",
+      "name" : "Microsoft Entra ID",
+      "properties" : {
+        "structurizr.dsl.identifier" : "entra"
+      },
+      "tags" : "Element,Software System"
+    }, {
+      "containers" : [ {
+        "description" : "Provides the browser-based user interface for managing blast plans.",
+        "documentation" : { },
+        "id" : "4",
+        "name" : "Blast Planning Web UI",
+        "properties" : {
+          "structurizr.dsl.identifier" : "web"
+        },
+        "relationships" : [ {
+          "description" : "Authenticates with",
+          "destinationId" : "2",
+          "id" : "12",
+          "sourceId" : "4",
+          "tags" : "Relationship",
+          "technology" : "OAuth 2.0 / OpenID Connect"
+        }, {
+          "description" : "Sends commands and queries to",
+          "destinationId" : "5",
+          "id" : "14",
+          "sourceId" : "4",
+          "tags" : "Relationship",
+          "technology" : "HTTPS / REST / JSON"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : "Angular"
+      }, {
+        "description" : "Handles commands and queries for blast plans. Commands are persisted as domain events and queries are served from the read model.",
+        "documentation" : { },
+        "id" : "5",
+        "name" : "Blast Planning API",
+        "properties" : {
+          "structurizr.dsl.identifier" : "api"
+        },
+        "relationships" : [ {
+          "description" : "Validates access tokens issued by",
+          "destinationId" : "2",
+          "id" : "15",
+          "sourceId" : "5",
+          "tags" : "Relationship"
+        }, {
+          "description" : "Appends and reads domain events",
+          "destinationId" : "7",
+          "id" : "16",
+          "sourceId" : "5",
+          "tags" : "Relationship",
+          "technology" : "Cosmos DB SDK"
+        }, {
+          "description" : "Publishes committed domain events",
+          "destinationId" : "8",
+          "id" : "17",
+          "sourceId" : "5",
+          "tags" : "Relationship",
+          "technology" : "Azure Service Bus"
+        }, {
+          "description" : "Queries blast plan projections",
+          "destinationId" : "9",
+          "id" : "20",
+          "sourceId" : "5",
+          "tags" : "Relationship",
+          "technology" : "SQL"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".NET 10 / ASP.NET Core"
+      }, {
+        "description" : "Consumes committed domain events asynchronously and maintains the SQL read model.",
+        "documentation" : { },
+        "id" : "6",
+        "name" : "Projection Function",
+        "properties" : {
+          "structurizr.dsl.identifier" : "projectionFunction"
+        },
+        "relationships" : [ {
+          "description" : "Consumes domain events from blast-plan-projections subscription",
+          "destinationId" : "8",
+          "id" : "18",
+          "sourceId" : "6",
+          "tags" : "Relationship",
+          "technology" : "Azure Service Bus"
+        }, {
+          "description" : "Creates and updates projections",
+          "destinationId" : "9",
+          "id" : "19",
+          "sourceId" : "6",
+          "tags" : "Relationship",
+          "technology" : "SQL"
+        } ],
+        "tags" : "Element,Container",
+        "technology" : ".NET 10 / Azure Functions"
+      }, {
+        "description" : "Stores the immutable event stream for blast plan aggregates.",
+        "documentation" : { },
+        "id" : "7",
+        "name" : "Event Store",
+        "properties" : {
+          "structurizr.dsl.identifier" : "eventStore"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Azure Cosmos DB"
+      }, {
+        "description" : "Distributes committed domain events to asynchronous consumers using the domain-events topic and blast-plan-projections subscription.",
+        "documentation" : { },
+        "id" : "8",
+        "name" : "Domain Event Bus",
+        "properties" : {
+          "structurizr.dsl.identifier" : "messageBus"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Azure Service Bus"
+      }, {
+        "description" : "Stores query-optimised blast plan projections.",
+        "documentation" : { },
+        "id" : "9",
+        "name" : "Blast Plan Read Model",
+        "properties" : {
+          "structurizr.dsl.identifier" : "readModel"
+        },
+        "tags" : "Element,Container",
+        "technology" : "Azure SQL Database"
+      } ],
+      "description" : "Event-sourced blast planning reference application.",
+      "documentation" : { },
+      "id" : "3",
+      "name" : "Blast Planning System",
+      "properties" : {
+        "structurizr.dsl.identifier" : "blastPlanning"
+      },
+      "relationships" : [ {
+        "description" : "Authenticates with",
+        "destinationId" : "2",
+        "id" : "13",
+        "linkedRelationshipId" : "12",
+        "sourceId" : "3",
+        "technology" : "OAuth 2.0 / OpenID Connect"
+      } ],
+      "tags" : "Element,Software System"
+    } ]
+  },
+  "name" : "Blast Planning Event Sourcing Reference",
+  "properties" : {
+    "structurizr.inspection.info" : "0",
+    "structurizr.inspection.ignore" : "0",
+    "structurizr.inspection.error" : "3",
+    "structurizr.inspection.warning" : "0",
+    "structurizr.dsl" : "d29ya3NwYWNlICJCbGFzdCBQbGFubmluZyBFdmVudCBTb3VyY2luZyBSZWZlcmVuY2UiICJSZWZlcmVuY2UgaW1wbGVtZW50YXRpb24gZGVtb25zdHJhdGluZyBDUVJTLCBldmVudCBzb3VyY2luZyBhbmQgYXN5bmNocm9ub3VzIHByb2plY3Rpb25zIG9uIEF6dXJlLiIgewoKICAgIG1vZGVsIHsKCiAgICAgICAgdXNlciA9IHBlcnNvbiAiVXNlciIgIlVzZXMgdGhlIEJsYXN0IFBsYW5uaW5nIGFwcGxpY2F0aW9uIHRvIGNyZWF0ZSwgYXBwcm92ZSBhbmQgcmV2aWV3IGJsYXN0IHBsYW5zLiIKCiAgICAgICAgZW50cmEgPSBzb2Z0d2FyZVN5c3RlbSAiTWljcm9zb2Z0IEVudHJhIElEIiAiUHJvdmlkZXMgYXV0aGVudGljYXRpb24gYW5kIGlzc3VlcyBhY2Nlc3MgdG9rZW5zLiIKCiAgICAgICAgYmxhc3RQbGFubmluZyA9IHNvZnR3YXJlU3lzdGVtICJCbGFzdCBQbGFubmluZyBTeXN0ZW0iICJFdmVudC1zb3VyY2VkIGJsYXN0IHBsYW5uaW5nIHJlZmVyZW5jZSBhcHBsaWNhdGlvbi4iIHsKCiAgICAgICAgICAgIHdlYiA9IGNvbnRhaW5lciAiQmxhc3QgUGxhbm5pbmcgV2ViIFVJIiAiUHJvdmlkZXMgdGhlIGJyb3dzZXItYmFzZWQgdXNlciBpbnRlcmZhY2UgZm9yIG1hbmFnaW5nIGJsYXN0IHBsYW5zLiIgIkFuZ3VsYXIiCgogICAgICAgICAgICBhcGkgPSBjb250YWluZXIgIkJsYXN0IFBsYW5uaW5nIEFQSSIgIkhhbmRsZXMgY29tbWFuZHMgYW5kIHF1ZXJpZXMgZm9yIGJsYXN0IHBsYW5zLiBDb21tYW5kcyBhcmUgcGVyc2lzdGVkIGFzIGRvbWFpbiBldmVudHMgYW5kIHF1ZXJpZXMgYXJlIHNlcnZlZCBmcm9tIHRoZSByZWFkIG1vZGVsLiIgIi5ORVQgMTAgLyBBU1AuTkVUIENvcmUiCgogICAgICAgICAgICBwcm9qZWN0aW9uRnVuY3Rpb24gPSBjb250YWluZXIgIlByb2plY3Rpb24gRnVuY3Rpb24iICJDb25zdW1lcyBjb21taXR0ZWQgZG9tYWluIGV2ZW50cyBhc3luY2hyb25vdXNseSBhbmQgbWFpbnRhaW5zIHRoZSBTUUwgcmVhZCBtb2RlbC4iICIuTkVUIDEwIC8gQXp1cmUgRnVuY3Rpb25zIgoKICAgICAgICAgICAgZXZlbnRTdG9yZSA9IGNvbnRhaW5lciAiRXZlbnQgU3RvcmUiICJTdG9yZXMgdGhlIGltbXV0YWJsZSBldmVudCBzdHJlYW0gZm9yIGJsYXN0IHBsYW4gYWdncmVnYXRlcy4iICJBenVyZSBDb3Ntb3MgREIiCgogICAgICAgICAgICBtZXNzYWdlQnVzID0gY29udGFpbmVyICJEb21haW4gRXZlbnQgQnVzIiAiRGlzdHJpYnV0ZXMgY29tbWl0dGVkIGRvbWFpbiBldmVudHMgdG8gYXN5bmNocm9ub3VzIGNvbnN1bWVycyB1c2luZyB0aGUgZG9tYWluLWV2ZW50cyB0b3BpYyBhbmQgYmxhc3QtcGxhbi1wcm9qZWN0aW9ucyBzdWJzY3JpcHRpb24uIiAiQXp1cmUgU2VydmljZSBCdXMiCgogICAgICAgICAgICByZWFkTW9kZWwgPSBjb250YWluZXIgIkJsYXN0IFBsYW4gUmVhZCBNb2RlbCIgIlN0b3JlcyBxdWVyeS1vcHRpbWlzZWQgYmxhc3QgcGxhbiBwcm9qZWN0aW9ucy4iICJBenVyZSBTUUwgRGF0YWJhc2UiCiAgICAgICAgfQoKICAgICAgICB1c2VyIC0+IHdlYiAiVXNlcyIgIkhUVFBTIgoKICAgICAgICB3ZWIgLT4gZW50cmEgIkF1dGhlbnRpY2F0ZXMgd2l0aCIgIk9BdXRoIDIuMCAvIE9wZW5JRCBDb25uZWN0IgoKICAgICAgICB3ZWIgLT4gYXBpICJTZW5kcyBjb21tYW5kcyBhbmQgcXVlcmllcyB0byIgIkhUVFBTIC8gUkVTVCAvIEpTT04iCgogICAgICAgIGFwaSAtPiBlbnRyYSAiVmFsaWRhdGVzIGFjY2VzcyB0b2tlbnMgaXNzdWVkIGJ5IgoKICAgICAgICBhcGkgLT4gZXZlbnRTdG9yZSAiQXBwZW5kcyBhbmQgcmVhZHMgZG9tYWluIGV2ZW50cyIgIkNvc21vcyBEQiBTREsiCgogICAgICAgIGFwaSAtPiBtZXNzYWdlQnVzICJQdWJsaXNoZXMgY29tbWl0dGVkIGRvbWFpbiBldmVudHMiICJBenVyZSBTZXJ2aWNlIEJ1cyIKCiAgICAgICAgcHJvamVjdGlvbkZ1bmN0aW9uIC0+IG1lc3NhZ2VCdXMgIkNvbnN1bWVzIGRvbWFpbiBldmVudHMgZnJvbSBibGFzdC1wbGFuLXByb2plY3Rpb25zIHN1YnNjcmlwdGlvbiIgIkF6dXJlIFNlcnZpY2UgQnVzIgoKICAgICAgICBwcm9qZWN0aW9uRnVuY3Rpb24gLT4gcmVhZE1vZGVsICJDcmVhdGVzIGFuZCB1cGRhdGVzIHByb2plY3Rpb25zIiAiU1FMIgoKICAgICAgICBhcGkgLT4gcmVhZE1vZGVsICJRdWVyaWVzIGJsYXN0IHBsYW4gcHJvamVjdGlvbnMiICJTUUwiCiAgICB9CgoKICAgIHZpZXdzIHsKCiAgICAgICAgc3lzdGVtQ29udGV4dCBibGFzdFBsYW5uaW5nICJTeXN0ZW1Db250ZXh0IiB7CiAgICAgICAgICAgIGluY2x1ZGUgKgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKCiAgICAgICAgY29udGFpbmVyIGJsYXN0UGxhbm5pbmcgIkNvbnRhaW5lcnMiIHsKICAgICAgICAgICAgaW5jbHVkZSAqCiAgICAgICAgICAgIGF1dG9MYXlvdXQgbHIKICAgICAgICB9CgoKICAgICAgICBkeW5hbWljIGJsYXN0UGxhbm5pbmcgIkNyZWF0ZUJsYXN0UGxhbiIgIkNyZWF0ZSBhIGJsYXN0IHBsYW4gYW5kIGFzeW5jaHJvbm91c2x5IHByb2plY3QgaXQgaW50byB0aGUgcmVhZCBtb2RlbC4iIHsKCiAgICAgICAgICAgIHVzZXIgLT4gd2ViICIxLiBFbnRlciBibGFzdCBwbGFuIGRldGFpbHMiCgogICAgICAgICAgICB3ZWIgLT4gYXBpICIyLiBQT1NUIGJsYXN0IHBsYW4iCgogICAgICAgICAgICBhcGkgLT4gZXZlbnRTdG9yZSAiMy4gQXBwZW5kIEJsYXN0UGxhbkNyZWF0ZWQgZXZlbnQiCgogICAgICAgICAgICBhcGkgLT4gbWVzc2FnZUJ1cyAiNC4gUHVibGlzaCBCbGFzdFBsYW5DcmVhdGVkIGV2ZW50IgoKICAgICAgICAgICAgcHJvamVjdGlvbkZ1bmN0aW9uIC0+IG1lc3NhZ2VCdXMgIjUuIFJlY2VpdmUgQmxhc3RQbGFuQ3JlYXRlZCBldmVudCIKCiAgICAgICAgICAgIHByb2plY3Rpb25GdW5jdGlvbiAtPiByZWFkTW9kZWwgIjYuIENyZWF0ZSBibGFzdCBwbGFuIHByb2plY3Rpb24iCgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKCiAgICAgICAgZHluYW1pYyBibGFzdFBsYW5uaW5nICJBcHByb3ZlQmxhc3RQbGFuIiAiQXBwcm92ZSBhIGJsYXN0IHBsYW4gYW5kIGFzeW5jaHJvbm91c2x5IHVwZGF0ZSBpdHMgcmVhZCBtb2RlbC4iIHsKCiAgICAgICAgICAgIHVzZXIgLT4gd2ViICIxLiBBcHByb3ZlIGJsYXN0IHBsYW4iCgogICAgICAgICAgICB3ZWIgLT4gYXBpICIyLiBTZW5kIGFwcHJvdmUgY29tbWFuZCIKCiAgICAgICAgICAgIGFwaSAtPiBldmVudFN0b3JlICIzLiBMb2FkIGJsYXN0IHBsYW4gZXZlbnQgc3RyZWFtIgoKICAgICAgICAgICAgYXBpIC0+IGV2ZW50U3RvcmUgIjQuIEFwcGVuZCBCbGFzdFBsYW5BcHByb3ZlZCBldmVudCIKCiAgICAgICAgICAgIGFwaSAtPiBtZXNzYWdlQnVzICI1LiBQdWJsaXNoIEJsYXN0UGxhbkFwcHJvdmVkIGV2ZW50IgoKICAgICAgICAgICAgcHJvamVjdGlvbkZ1bmN0aW9uIC0+IG1lc3NhZ2VCdXMgIjYuIFJlY2VpdmUgQmxhc3RQbGFuQXBwcm92ZWQgZXZlbnQiCgogICAgICAgICAgICBwcm9qZWN0aW9uRnVuY3Rpb24gLT4gcmVhZE1vZGVsICI3LiBVcGRhdGUgYmxhc3QgcGxhbiBwcm9qZWN0aW9uIgoKICAgICAgICAgICAgYXV0b0xheW91dCBscgogICAgICAgIH0KCgogICAgICAgIGR5bmFtaWMgYmxhc3RQbGFubmluZyAiUXVlcnlCbGFzdFBsYW5zIiAiUXVlcnkgYmxhc3QgcGxhbnMgZnJvbSB0aGUgU1FMIHJlYWQgbW9kZWwuIiB7CgogICAgICAgICAgICB1c2VyIC0+IHdlYiAiMS4gUmVxdWVzdCBibGFzdCBwbGFucyIKCiAgICAgICAgICAgIHdlYiAtPiBhcGkgIjIuIEdFVCBibGFzdCBwbGFucyIKCiAgICAgICAgICAgIGFwaSAtPiByZWFkTW9kZWwgIjMuIFF1ZXJ5IGJsYXN0IHBsYW4gcHJvamVjdGlvbnMiCgogICAgICAgICAgICBhdXRvTGF5b3V0IGxyCiAgICAgICAgfQoKCiAgICAgICAgc3R5bGVzIHsKCiAgICAgICAgICBlbGVtZW50ICJQZXJzb24iIHsKICAgICAgICAgICAgc2hhcGUgcGVyc29uCiAgICAgICAgICB9CgogICAgICAgICAgZWxlbWVudCAiRXh0ZXJuYWwiIHsKICAgICAgICAgICAgYm9yZGVyIGRhc2hlZAogICAgICAgICAgfQoKICAgICAgICAgIGVsZW1lbnQgIlN5c3RlbSIgewogICAgICAgICAgICBzaGFwZSByb3VuZGVkQm94CiAgICAgICAgICB9CgogICAgICAgICAgZWxlbWVudCAiV2ViIiB7CiAgICAgICAgICAgIHNoYXBlIHJvdW5kZWRCb3gKICAgICAgICAgIH0KCiAgICAgICAgICBlbGVtZW50ICJHYXRld2F5IiB7CiAgICAgICAgICAgIHNoYXBlIHJvdW5kZWRCb3gKICAgICAgICAgIH0KCiAgICAgICAgICBlbGVtZW50ICJTZXJ2aWNlIiB7CiAgICAgICAgICAgIHNoYXBlIHJvdW5kZWRCb3gKICAgICAgICAgIH0KCiAgICAgICAgICBlbGVtZW50ICJEYXRhYmFzZSIgewogICAgICAgICAgICBzaGFwZSBjeWxpbmRlcgogICAgICAgICAgfQoKICAgICAgICAgIGVsZW1lbnQgIk1lc3NhZ2luZyIgewogICAgICAgICAgICBzaGFwZSBwaXBlCiAgICAgICAgICB9CgogICAgICAgICAgZWxlbWVudCAiSW5mcmEiIHsKICAgICAgICAgICAgc2hhcGUgcm91bmRlZEJveAogICAgICAgICAgfQogICAgICAgIH0KCiAgICB9CgogICAgY29uZmlndXJhdGlvbiB7CiAgICAgICAgc2NvcGUgc29mdHdhcmVzeXN0ZW0KICAgIH0KfQ=="
+  },
+  "views" : {
+    "configuration" : {
+      "branding" : { },
+      "lastSavedView" : "Containers",
+      "metadataSymbols" : "SquareBrackets",
+      "styles" : {
+        "elements" : [ {
+          "shape" : "Cylinder",
+          "tag" : "Database"
+        }, {
+          "border" : "Dashed",
+          "tag" : "External"
+        }, {
+          "shape" : "RoundedBox",
+          "tag" : "Gateway"
+        }, {
+          "shape" : "RoundedBox",
+          "tag" : "Infra"
+        }, {
+          "shape" : "Pipe",
+          "tag" : "Messaging"
+        }, {
+          "shape" : "Person",
+          "tag" : "Person"
+        }, {
+          "shape" : "RoundedBox",
+          "tag" : "Service"
+        }, {
+          "shape" : "RoundedBox",
+          "tag" : "System"
+        }, {
+          "shape" : "RoundedBox",
+          "tag" : "Web"
+        } ]
+      },
+      "terminology" : { }
+    },
+    "containerViews" : [ {
+      "automaticLayout" : {
+        "applied" : true,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "dimensions" : {
+        "height" : 2520,
+        "width" : 3070
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 199,
+        "y" : 1329
+      }, {
+        "id" : "2",
+        "x" : 2399,
+        "y" : 1979
+      }, {
+        "id" : "4",
+        "x" : 899,
+        "y" : 1379
+      }, {
+        "id" : "5",
+        "x" : 1649,
+        "y" : 1375
+      }, {
+        "id" : "6",
+        "x" : 1649,
+        "y" : 479
+      }, {
+        "id" : "7",
+        "x" : 2399,
+        "y" : 1379
+      }, {
+        "id" : "8",
+        "x" : 2399,
+        "y" : 779
+      }, {
+        "id" : "9",
+        "x" : 2399,
+        "y" : 179
+      } ],
+      "externalSoftwareSystemBoundariesVisible" : false,
+      "key" : "Containers",
+      "name" : "Container View: Blast Planning System",
+      "order" : 2,
+      "relationships" : [ {
+        "id" : "10"
+      }, {
+        "id" : "12",
+        "vertices" : [ {
+          "x" : 1649,
+          "y" : 1825
+        } ]
+      }, {
+        "id" : "14"
+      }, {
+        "id" : "15"
+      }, {
+        "id" : "16"
+      }, {
+        "id" : "17"
+      }, {
+        "id" : "18"
+      }, {
+        "id" : "19"
+      }, {
+        "id" : "20",
+        "vertices" : [ {
+          "x" : 2399,
+          "y" : 629
+        } ]
+      } ],
+      "softwareSystemId" : "3"
+    } ],
+    "dynamicViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "description" : "Create a blast plan and asynchronously project it into the read model.",
+      "elementId" : "3",
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "6",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalBoundariesVisible" : false,
+      "key" : "CreateBlastPlan",
+      "name" : "Dynamic View: Blast Planning System",
+      "order" : 3,
+      "relationships" : [ {
+        "description" : "1. Enter blast plan details",
+        "id" : "10",
+        "order" : "1",
+        "response" : false
+      }, {
+        "description" : "2. POST blast plan",
+        "id" : "14",
+        "order" : "2",
+        "response" : false
+      }, {
+        "description" : "3. Append BlastPlanCreated event",
+        "id" : "16",
+        "order" : "3",
+        "response" : false
+      }, {
+        "description" : "4. Publish BlastPlanCreated event",
+        "id" : "17",
+        "order" : "4",
+        "response" : false
+      }, {
+        "description" : "5. Receive BlastPlanCreated event",
+        "id" : "18",
+        "order" : "5",
+        "response" : false
+      }, {
+        "description" : "6. Create blast plan projection",
+        "id" : "19",
+        "order" : "6",
+        "response" : false
+      } ]
+    }, {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "description" : "Approve a blast plan and asynchronously update its read model.",
+      "elementId" : "3",
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "6",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "7",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "8",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalBoundariesVisible" : false,
+      "key" : "ApproveBlastPlan",
+      "name" : "Dynamic View: Blast Planning System",
+      "order" : 4,
+      "relationships" : [ {
+        "description" : "1. Approve blast plan",
+        "id" : "10",
+        "order" : "1",
+        "response" : false
+      }, {
+        "description" : "2. Send approve command",
+        "id" : "14",
+        "order" : "2",
+        "response" : false
+      }, {
+        "description" : "3. Load blast plan event stream",
+        "id" : "16",
+        "order" : "3",
+        "response" : false
+      }, {
+        "description" : "4. Append BlastPlanApproved event",
+        "id" : "16",
+        "order" : "4",
+        "response" : false
+      }, {
+        "description" : "5. Publish BlastPlanApproved event",
+        "id" : "17",
+        "order" : "5",
+        "response" : false
+      }, {
+        "description" : "6. Receive BlastPlanApproved event",
+        "id" : "18",
+        "order" : "6",
+        "response" : false
+      }, {
+        "description" : "7. Update blast plan projection",
+        "id" : "19",
+        "order" : "7",
+        "response" : false
+      } ]
+    }, {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "description" : "Query blast plans from the SQL read model.",
+      "elementId" : "3",
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "4",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "5",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "9",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "externalBoundariesVisible" : false,
+      "key" : "QueryBlastPlans",
+      "name" : "Dynamic View: Blast Planning System",
+      "order" : 5,
+      "relationships" : [ {
+        "description" : "1. Request blast plans",
+        "id" : "10",
+        "order" : "1",
+        "response" : false
+      }, {
+        "description" : "2. GET blast plans",
+        "id" : "14",
+        "order" : "2",
+        "response" : false
+      }, {
+        "description" : "3. Query blast plan projections",
+        "id" : "20",
+        "order" : "3",
+        "response" : false
+      } ]
+    } ],
+    "systemContextViews" : [ {
+      "automaticLayout" : {
+        "applied" : false,
+        "edgeSeparation" : 0,
+        "implementation" : "Graphviz",
+        "nodeSeparation" : 300,
+        "rankDirection" : "LeftRight",
+        "rankSeparation" : 300,
+        "vertices" : false
+      },
+      "elements" : [ {
+        "id" : "1",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "2",
+        "x" : 0,
+        "y" : 0
+      }, {
+        "id" : "3",
+        "x" : 0,
+        "y" : 0
+      } ],
+      "enterpriseBoundaryVisible" : true,
+      "key" : "SystemContext",
+      "name" : "System Context View: Blast Planning System",
+      "order" : 1,
+      "relationships" : [ {
+        "id" : "11"
+      }, {
+        "id" : "13"
+      } ],
+      "softwareSystemId" : "3"
+    } ]
+  }
+}
