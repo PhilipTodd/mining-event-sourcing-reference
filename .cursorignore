@@ -2,6 +2,19 @@
 # .cursorignore - Optimized for .NET, Bicep, YAML, and Angular
 # =========================================================================
 
+# Structurizr temporary files, local server cache, and thumbnails
+.structurizr/
+
+# Jekyll
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/.sass-cache/
+
+# Ruby
+docs/vendor/
+.bundle/
+
 # --- Angular & Frontend Noise ---
 **/node_modules/
 **/.angular/
@@ -51,3 +64,4 @@
 
 # Exclude local Bicep param files
 main.dev.local.bicepparam
+dev.local.bicepparam
