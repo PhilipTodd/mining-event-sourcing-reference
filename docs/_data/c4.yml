@@ -1,0 +1,15 @@
+# Paths to Structurizr-exported diagrams (SVG or PNG).
+# Drop files into assets/diagrams/ and update the paths.
+levels:
+  - id: context
+    label: System Context
+    src: /assets/diagrams/c4-context.svg
+    caption: People and systems that interact with the application.
+  - id: container
+    label: Container
+    src: /assets/diagrams/c4-container.svg
+    caption: Deployable units, data stores, and how they talk.
+  - id: component
+    label: Component
+    src: /assets/diagrams/c4-component.svg
+    caption: Major components inside the primary container.

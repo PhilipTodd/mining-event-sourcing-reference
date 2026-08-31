@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="460" viewBox="0 0 960 460" role="img" aria-label="C4 container placeholder">
+  <rect width="960" height="460" fill="#F4F7FB"/>
+  <rect x="48" y="48" width="864" height="360" rx="14" fill="#FFF" stroke="#D9E2EC"/>
+  <text x="72" y="84" font-family="Segoe UI, sans-serif" font-size="14" fill="#5B677A">Software System</text>
+  <rect x="88" y="120" width="220" height="120" rx="8" fill="#0B1220"/>
+  <text x="198" y="172" text-anchor="middle" fill="#FFF" font-family="Segoe UI, sans-serif" font-size="16">Web App</text>
+  <text x="198" y="196" text-anchor="middle" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="12">Container</text>
+  <rect x="370" y="120" width="220" height="120" rx="8" fill="#0078D4"/>
+  <text x="480" y="172" text-anchor="middle" fill="#FFF" font-family="Segoe UI, sans-serif" font-size="16">API</text>
+  <text x="480" y="196" text-anchor="middle" fill="#D6EBFA" font-family="Segoe UI, sans-serif" font-size="12">Container</text>
+  <rect x="652" y="120" width="220" height="120" rx="8" fill="#334155"/>
+  <text x="762" y="172" text-anchor="middle" fill="#FFF" font-family="Segoe UI, sans-serif" font-size="16">Database</text>
+  <text x="762" y="196" text-anchor="middle" fill="#94A3B8" font-family="Segoe UI, sans-serif" font-size="12">Container</text>
+  <text x="480" y="430" text-anchor="middle" font-family="Segoe UI, sans-serif" font-size="13" fill="#5B677A">C4 Container - assets/diagrams/c4-container.svg</text>
+</svg>
