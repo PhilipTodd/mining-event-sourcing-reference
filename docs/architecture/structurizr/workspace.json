@@ -6,7 +6,7 @@
   "documentation" : { },
   "id" : 1,
   "lastModifiedAgent" : "structurizr-ui",
-  "lastModifiedDate" : "2026-08-27T01:16:59Z",
+  "lastModifiedDate" : "2026-08-27T05:45:39Z",
   "model" : {
     "people" : [ {
       "description" : "Uses the Blast Planning application to create, approve and review blast plans.",
@@ -190,7 +190,7 @@
   "views" : {
     "configuration" : {
       "branding" : { },
-      "lastSavedView" : "Containers",
+      "lastSavedView" : "QueryBlastPlans",
       "metadataSymbols" : "SquareBrackets",
       "styles" : {
         "elements" : [ {
@@ -306,7 +306,7 @@
     } ],
     "dynamicViews" : [ {
       "automaticLayout" : {
-        "applied" : false,
+        "applied" : true,
         "edgeSeparation" : 0,
         "implementation" : "Graphviz",
         "nodeSeparation" : 300,
@@ -315,35 +315,39 @@
         "vertices" : false
       },
       "description" : "Create a blast plan and asynchronously project it into the read model.",
+      "dimensions" : {
+        "height" : 2019,
+        "width" : 3070
+      },
       "elementId" : "3",
       "elements" : [ {
         "id" : "1",
-        "x" : 0,
-        "y" : 0
+        "x" : 199,
+        "y" : 262
       }, {
         "id" : "4",
-        "x" : 0,
-        "y" : 0
+        "x" : 899,
+        "y" : 312
       }, {
         "id" : "5",
-        "x" : 0,
-        "y" : 0
+        "x" : 1649,
+        "y" : 312
       }, {
         "id" : "6",
-        "x" : 0,
-        "y" : 0
+        "x" : 1649,
+        "y" : 1212
       }, {
         "id" : "7",
-        "x" : 0,
-        "y" : 0
+        "x" : 2399,
+        "y" : 162
       }, {
         "id" : "8",
-        "x" : 0,
-        "y" : 0
+        "x" : 2399,
+        "y" : 762
       }, {
         "id" : "9",
-        "x" : 0,
-        "y" : 0
+        "x" : 2399,
+        "y" : 1362
       } ],
       "externalBoundariesVisible" : false,
       "key" : "CreateBlastPlan",
@@ -382,7 +386,7 @@
       } ]
     }, {
       "automaticLayout" : {
-        "applied" : false,
+        "applied" : true,
         "edgeSeparation" : 0,
         "implementation" : "Graphviz",
         "nodeSeparation" : 300,
@@ -391,35 +395,39 @@
         "vertices" : false
       },
       "description" : "Approve a blast plan and asynchronously update its read model.",
+      "dimensions" : {
+        "height" : 2056,
+        "width" : 3070
+      },
       "elementId" : "3",
       "elements" : [ {
         "id" : "1",
-        "x" : 0,
-        "y" : 0
+        "x" : 200,
+        "y" : 149
       }, {
         "id" : "4",
-        "x" : 0,
-        "y" : 0
+        "x" : 900,
+        "y" : 199
       }, {
         "id" : "5",
-        "x" : 0,
-        "y" : 0
+        "x" : 1650,
+        "y" : 199
       }, {
         "id" : "6",
-        "x" : 0,
-        "y" : 0
+        "x" : 1650,
+        "y" : 1099
       }, {
         "id" : "7",
-        "x" : 0,
-        "y" : 0
+        "x" : 2400,
+        "y" : 199
       }, {
         "id" : "8",
-        "x" : 0,
-        "y" : 0
+        "x" : 2400,
+        "y" : 799
       }, {
         "id" : "9",
-        "x" : 0,
-        "y" : 0
+        "x" : 2400,
+        "y" : 1399
       } ],
       "externalBoundariesVisible" : false,
       "key" : "ApproveBlastPlan",
@@ -439,12 +447,20 @@
         "description" : "3. Load blast plan event stream",
         "id" : "16",
         "order" : "3",
-        "response" : false
+        "response" : false,
+        "vertices" : [ {
+          "x" : 2250,
+          "y" : 499
+        } ]
       }, {
         "description" : "4. Append BlastPlanApproved event",
         "id" : "16",
         "order" : "4",
-        "response" : false
+        "response" : false,
+        "vertices" : [ {
+          "x" : 2250,
+          "y" : 199
+        } ]
       }, {
         "description" : "5. Publish BlastPlanApproved event",
         "id" : "17",
@@ -463,7 +479,7 @@
       } ]
     }, {
       "automaticLayout" : {
-        "applied" : false,
+        "applied" : true,
         "edgeSeparation" : 0,
         "implementation" : "Graphviz",
         "nodeSeparation" : 300,
@@ -472,23 +488,27 @@
         "vertices" : false
       },
       "description" : "Query blast plans from the SQL read model.",
+      "dimensions" : {
+        "height" : 849,
+        "width" : 3070
+      },
       "elementId" : "3",
       "elements" : [ {
         "id" : "1",
-        "x" : 0,
-        "y" : 0
+        "x" : 199,
+        "y" : 142
       }, {
         "id" : "4",
-        "x" : 0,
-        "y" : 0
+        "x" : 899,
+        "y" : 192
       }, {
         "id" : "5",
-        "x" : 0,
-        "y" : 0
+        "x" : 1649,
+        "y" : 192
       }, {
         "id" : "9",
-        "x" : 0,
-        "y" : 0
+        "x" : 2399,
+        "y" : 192
       } ],
       "externalBoundariesVisible" : false,
       "key" : "QueryBlastPlans",
@@ -513,7 +533,7 @@
     } ],
     "systemContextViews" : [ {
       "automaticLayout" : {
-        "applied" : false,
+        "applied" : true,
         "edgeSeparation" : 0,
         "implementation" : "Graphviz",
         "nodeSeparation" : 300,
@@ -521,18 +541,22 @@
         "rankSeparation" : 300,
         "vertices" : false
       },
+      "dimensions" : {
+        "height" : 800,
+        "width" : 2300
+      },
       "elements" : [ {
         "id" : "1",
-        "x" : 0,
-        "y" : 0
+        "x" : 199,
+        "y" : 160
       }, {
         "id" : "2",
-        "x" : 0,
-        "y" : 0
+        "x" : 1649,
+        "y" : 210
       }, {
         "id" : "3",
-        "x" : 0,
-        "y" : 0
+        "x" : 899,
+        "y" : 210
       } ],
       "enterpriseBoundaryVisible" : true,
       "key" : "SystemContext",
