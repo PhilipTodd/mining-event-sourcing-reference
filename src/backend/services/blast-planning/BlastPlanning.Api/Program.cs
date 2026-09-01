@@ -132,7 +132,7 @@ app.UseExceptionHandler(errorApp =>
 
 
 // Add a blast plan
-app.MapPost("/blast-plans", 
+app.MapPost("/blast-plans",
     async (CreateBlastPlanRequest request,
         ISender sender,
         CancellationToken cancellationToken) =>
@@ -149,7 +149,7 @@ app.MapPost("/blast-plans",
         }).RequireAuthorization();
 
 // Approve a blast plan
-app.MapPost("/blast-plans/{id:guid}/approve", 
+app.MapPost("/blast-plans/{id:guid}/approve",
     async (Guid id,
         ApproveBlastPlanRequest request,
         ISender sender,
@@ -163,7 +163,7 @@ app.MapPost("/blast-plans/{id:guid}/approve",
         }).RequireAuthorization();
 
 // Get a blast plan summary
-app.MapGet("/blast-plans/{id:guid}", 
+app.MapGet("/blast-plans/{id:guid}",
     async (Guid id,
         ISender sender,
         CancellationToken cancellationToken) =>
@@ -203,7 +203,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -225,8 +225,8 @@ public sealed record ApproveBlastPlanRequest(
     string ApprovedBy);
 
 record WeatherForecast(
-    DateOnly Date, 
-    int TemperatureC, 
+    DateOnly Date,
+    int TemperatureC,
     string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
