@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-blast-plan-lookup',
   imports: [
-    NgIf,
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
