@@ -1,5 +1,5 @@
 title: Reference Project
-description: Concise technical documentation for a reference application - architecture, decisions, operations, and a live demo.
+description: Technical documentation for the Blast IQ reference application - architecture, decisions, operations, and a live demo.
 lang: en
 encoding: utf-8
 
@@ -43,28 +43,26 @@ defaults:
 # Per-project settings. Copy this file into each documentation site and edit.
 # ---------------------------------------------------------------------------
 project:
-  name: Reference Project
-  short_name: RefProj
+  name: Blast Planning Reference Project
+  short_name: BlastIQ
   tagline: Production-shaped software, documented for a hiring conversation.
   # The Pitch: 2-3 sentences on the "Why."
   pitch: >
-    Hiring managers should understand the problem in under ten seconds.
-    This template is the shared look and feel for three reference projects -
-    swap the pitch, demo URL, credentials, and hero images per build.
+    A reference project demonstrating hands-on experience designing and building a modern, event-driven application using .NET, Angular and Azure, with event sourcing, CQRS, cloud-native architecture, infrastructure as code, CI/CD, security and observability.
   demo:
-    url: "https://example.com"
+    url: "https://demo.event-sourcing.ausdatatech.com.au"
     label: Open live demo
   credentials:
     enabled: true
-    username: demo.user
-    password: ChangeMe!
-    notes: Read-only sample account. Do not enter real data.
+    username: 
+    password: 
+    notes: A login is not required to view the demo.
   github:
-    repo: "https://github.com/example/reference-project"
-    issues: "https://github.com/example/reference-project/issues"
+    repo: "https://github.com/PhilipTodd/mining-event-sourcing-reference"
+    issues: "https://github.com/PhilipTodd/mining-event-sourcing-reference/issues"
   images:
-    landscape: /assets/images/hero-landscape.svg
-    portrait: /assets/images/hero-portrait.svg
+    landscape: /assets/images/blastiq-screenshot.png
+    portrait: /assets/images/event-sourcing-social-media-Vertical.png
     alt: Product screenshot placeholder
   facts:
     - label: Platform
@@ -74,7 +72,7 @@ project:
     - label: CI/CD
       value: GitHub Actions
     - label: Branching
-      value: GitHub Flow
+      value: Trunk Based
 
 author:
   name: Philip

@@ -8,7 +8,7 @@ permalink: /
 
 ## Start here
 
-Employers should leave this page with the problem, a working demo, and a path into architecture and decisions. Everything else is supporting evidence.
+This application demonstrates an event-sourced approach to explosives blast planning within the mining industry. Simple blast plans are created using the UI. Plans follow a short lifecycle consisting of a Create --> Approve path. These events are stored in Cosmos DB and distributed via Service Bus topic to a worker process which projects status into an Azure SQL DB achieving eventual consistency.
 
 <ul class="jump-cards">
   <li>
@@ -36,5 +36,3 @@ Employers should leave this page with the problem, a working demo, and a path in
     </a>
   </li>
 </ul>
-
-{% include callout.html type="note" title="Template copy" content="Replace this section when a project site is generated. Keep the pitch on the hero to two or three sentences. Do not paste a full product essay onto the home page." %}
