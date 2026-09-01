@@ -29,7 +29,7 @@ stages:
 
     jobs:
       - job: BuildUi
-        displayName: Build and package Angular UI
+        displayName: Build, lint and package Angular UI
 
         steps:
           - checkout: self
@@ -48,6 +48,11 @@ stages:
           - script: |
               npm ci
             displayName: Install dependencies
+            workingDirectory: '$(uiProjectDirectory)'
+
+          - script: |
+              npm run lint
+            displayName: Lint Angular application
             workingDirectory: '$(uiProjectDirectory)'
 
           - script: |
