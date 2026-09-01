@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -24,16 +24,17 @@ import { BlastPlanApiService } from '../../core/services/blast-plan-api.service'
   styleUrl: './create-blast-plan.scss',
 })
 export class CreateBlastPlan {
+  private readonly fb = inject(FormBuilder);
+  private readonly api = inject(BlastPlanApiService);
+  private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   readonly form;
 
   isSubmitting = false;
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly api: BlastPlanApiService,
-    private readonly router: Router,
-    private readonly snackBar: MatSnackBar,
-    private readonly cdr: ChangeDetectorRef) {
+  constructor() {
     this.form = this.fb.nonNullable.group({
       name: ['', [Validators.required, Validators.maxLength(200)]],
       siteId: ['', [Validators.required, Validators.maxLength(100)]]
