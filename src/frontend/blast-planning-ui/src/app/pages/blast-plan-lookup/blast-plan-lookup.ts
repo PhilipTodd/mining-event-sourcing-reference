@@ -1,5 +1,4 @@
-import { NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +9,6 @@ import { MatInputModule } from '@angular/material/input';
 @Component({
   selector: 'app-blast-plan-lookup',
   imports: [
-    NgIf,
     ReactiveFormsModule,
     MatButtonModule,
     MatCardModule,
@@ -21,11 +19,12 @@ import { MatInputModule } from '@angular/material/input';
   styleUrl: './blast-plan-lookup.scss'
 })
 export class BlastPlanLookup {
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+
   readonly form;
 
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly router: Router) {
+  constructor() {
     this.form = this.fb.nonNullable.group({
       blastPlanId: ['', [Validators.required]]
     });

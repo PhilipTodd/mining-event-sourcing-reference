@@ -29,7 +29,7 @@ export function msalInterceptorConfigFactory():
     environment.apiBaseUrl.replace(/\/+$/, '');
 
   const protectedResourceMap =
-    new Map<string, Array<string> | null>();
+    new Map<string, string[] | null>();
 
   protectedResourceMap.set(
     `${apiBaseUrl}/blast-plans/recent`,

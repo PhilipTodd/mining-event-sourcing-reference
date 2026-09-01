@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -23,17 +23,16 @@ import { BlastPlanApiService } from '../../core/services/blast-plan-api.service'
   styleUrl: './blast-plan-detail.scss'
 })
 export class BlastPlanDetail implements OnInit {
+  private readonly route = inject(ActivatedRoute);
+  private readonly api = inject(BlastPlanApiService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly msal = inject(MsalService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   blastPlanId = '';
   summary: BlastPlanSummary | null = null;
   isLoading = false;
   isApproving = false;
-
-  constructor(
-    private readonly route: ActivatedRoute,
-    private readonly api: BlastPlanApiService,
-    private readonly snackBar: MatSnackBar,
-    private readonly msal: MsalService,
-    private readonly cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.blastPlanId = this.route.snapshot.paramMap.get('id') ?? '';

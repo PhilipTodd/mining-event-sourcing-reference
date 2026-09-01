@@ -13,7 +13,7 @@ pool:
 
 variables:
   buildConfiguration: 'Release'
-  solutionPath: '**/**/*.slnx'
+  solutionPath: 'AzureDistributedSystemsReference.slnx'
 
 steps:
   - task: UseDotNet@2
@@ -27,6 +27,12 @@ steps:
     inputs:
       command: 'restore'
       projects: '$(solutionPath)'
+
+  - script: |
+      dotnet format "$(solutionPath)" \
+        --verify-no-changes \
+        --no-restore
+    displayName: 'Lint .NET code'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build'

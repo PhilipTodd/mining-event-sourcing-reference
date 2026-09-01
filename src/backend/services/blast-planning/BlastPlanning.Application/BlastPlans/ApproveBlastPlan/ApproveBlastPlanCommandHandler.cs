@@ -26,7 +26,7 @@ public sealed class ApproveBlastPlanCommandHandler(
             throw new NotFoundException(
                 $"Blast plan '{request.BlastPlanId}' was not found.");
         }
-        
+
         var blastPlan = BlastPlan.FromHistory(events);
 
         blastPlan.Approve(

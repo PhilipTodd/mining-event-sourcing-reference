@@ -15,9 +15,17 @@
         <mat-form-field appearance="outline">
           <mat-label>Blast Plan ID</mat-label>
           <input matInput formControlName="blastPlanId" placeholder="Paste BlastPlanId" />
-          <mat-error *ngIf="form.controls.blastPlanId.hasError('required')">
+
+
+        @if(form.controls.blastPlanId.hasError('required')){
+            <mat-error>
+              Blast Plan ID is required
+            </mat-error>
+        }
+
+          <!-- <mat-error *ngIf="form.controls.blastPlanId.hasError('required')">
             Blast Plan ID is required
-          </mat-error>
+          </mat-error> -->
         </mat-form-field>
 
         <div class="actions">
