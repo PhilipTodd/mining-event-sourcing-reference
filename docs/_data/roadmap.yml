@@ -1,10 +1,13 @@
 items:
   - status: now
-    title: Shared documentation template
-    detail: Layout, colour, navigation, and component set accepted once.
+    title: Security and cloud hardening
+    detail: Move toward Managed Identity and Key Vault, reduce connection-string/secret usage.
   - status: next
-    title: Project-specific documentation sites
-    detail: Pitch, demo, C4 exports, ADRs, and Azure inventory per reference app.
+    title: Observability and operational readiness
+    detail: Build useful Application Insights dashboards/queries covering API latency, failed requests, Function failures, Service Bus backlog and projection lag.
   - status: later
-    title: Production hardening notes
-    detail: DR, rollback, and alerting filled from each project's real operations plan.
+    title: Load, performance and scalability testing
+    detail: Add scenarios for realistic create/approve/query workloads, document results, identify the first bottleneck, and demonstrate how the system behaves under projection backlog.
+  - status: later
+    title: Resilience and failure handling
+    detail: Demonstrate retries, dead-letter handling, idempotent projections, duplicate-message processing, transient SQL/Cosmos failures, and recovery.

@@ -26,7 +26,7 @@ This application demonstrates an event-sourced approach to explosives blast plan
   <li>
     <a href="{{ '/deployment/' | relative_url }}">
       <strong>Deployment pipeline</strong>
-      <span>Linting through production, including the gated release.</span>
+      <span>CI on main, then manual infra, API, and UI deploys to dev.</span>
     </a>
   </li>
   <li>

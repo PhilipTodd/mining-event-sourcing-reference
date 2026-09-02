@@ -2,11 +2,15 @@
 layout: page
 title: Observability
 eyebrow: Operations
-description: Azure Monitor and Application Insights. Golden signals plus a small set of custom events.
+description: Achieved using Azure Monitor and Application Insights. Golden signals plus a small set of custom events.
 permalink: /observability/
 ---
 
-Telemetry is a product feature, not a dashboard hobby. This project uses **Application Insights** (Azure Monitor) for traces, metrics, and exceptions.
+This project uses **Application Insights** (Azure Monitor) for traces, metrics, and exceptions. 
+
+Observability is essential for investigating and preventing Production issues. To keep hosting costs down the Application Insights instance is part of the Shared Development Platform. 
+
+{% include callout.html type="info" title="" content="NOTE: Production ready observability has not yet been implemented for this project." %}
 
 ## Golden signals
 
@@ -29,12 +33,12 @@ Telemetry is a product feature, not a dashboard hobby. This project uses **Appli
   </div>
 </div>
 
+Using Azure Monitor and Application Insights, the Golden Signals above are tracked through a combination of out-of-the-box telemetry tables, pre-aggregated platform metrics, and custom Kusto Query Language (KQL) queries. These can be surfaced via Azure Qorkbooks and Alert Rules to allow teams to respond to growing threats quickly.
+
 ## Custom telemetry
 
-Name a few events that map to the product, not the framework. Examples to replace per project:
+Below are suggested events that can be traced. Actual events TBN:
 
 - `Demo.SessionStarted`
-- `Checkout.Completed` / the domain equivalent
+- `Plan.Approved` / the domain equivalent
 - `Auth.Failed` with result code, never a secret
-
-{% include callout.html type="note" title="Fill from the application" content="When project content is written, list the actual custom events and the alert rules that fire on them." %}

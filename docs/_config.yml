@@ -54,8 +54,8 @@ project:
     label: Open live demo
   credentials:
     enabled: true
-    username: 
-    password: 
+    username: none
+    password: none
     notes: A login is not required to view the demo.
   github:
     repo: "https://github.com/PhilipTodd/mining-event-sourcing-reference"
@@ -75,5 +75,5 @@ project:
       value: Trunk Based
 
 author:
-  name: Philip
-  url: ""
+  name: Philip Todd
+  url: "https://ausdatatech.com.au/"

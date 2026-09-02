@@ -20,8 +20,3 @@ primary:
     url: /scalability/
   - title: Roadmap
     url: /roadmap/
-
-# Template-only. Hide or delete this entry when cloning for a real project.
-template:
-  - title: Style guide
-    url: /style-guide/

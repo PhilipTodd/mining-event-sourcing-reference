@@ -1,5 +1,7 @@
-<ol class="pipeline" aria-label="Deployment pipeline">
-  {% for stage in site.data.pipeline.stages %}
+{% assign flow = site.data.pipeline.pipelines | where: "id", include.id | first %}
+{% if flow %}
+<ol class="pipeline" style="--pipeline-steps: {{ flow.stages.size }}" aria-label="{{ flow.label }} pipeline">
+  {% for stage in flow.stages %}
     <li class="pipeline__stage{% if forloop.last %} pipeline__stage--prod{% endif %}">
       <span class="pipeline__index">{{ forloop.index }}</span>
       <span class="pipeline__name">{{ stage.name }}</span>
@@ -7,3 +9,4 @@
     </li>
   {% endfor %}
 </ol>
+{% endif %}
