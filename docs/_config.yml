@@ -1,18 +1,79 @@
-title: Event Sourcing Reference Platform
-description: Cloud-native event-sourced reference implementation built with .NET 10 and Azure.
+title: Reference Project
+description: Technical documentation for the Blast IQ reference application - architecture, decisions, operations, and a live demo.
+lang: en
+encoding: utf-8
 
-theme: minima
+# Set these per repository when publishing to GitHub Pages.
+# Project site example: url: "https://username.github.io"  baseurl: "/repo-name"
+url: ""
+baseurl: ""
 
 markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+  syntax_highlighter_opts:
+    css_class: "highlight"
 
+permalink: pretty
+highlighter: rouge
+
+# Custom layouts in this repo override Minima. Do not set `theme:`.
 plugins:
   - jekyll-seo-tag
+  - jekyll-sitemap
 
-collections: {}
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - vendor
+  - node_modules
+  - .gitignore
+  - .github
 
 defaults:
-  -
-    scope:
+  - scope:
       path: ""
     values:
-      layout: default
+      layout: page
+      hide_sidebar: false
+
+# ---------------------------------------------------------------------------
+# Per-project settings. Copy this file into each documentation site and edit.
+# ---------------------------------------------------------------------------
+project:
+  name: Blast Planning Reference Project
+  short_name: BlastIQ
+  tagline: Production-shaped software, documented for a hiring conversation.
+  # The Pitch: 2-3 sentences on the "Why."
+  pitch: >
+    A reference project demonstrating hands-on experience designing and building a modern, event-driven application using .NET, Angular and Azure, with event sourcing, CQRS, cloud-native architecture, infrastructure as code, CI/CD, security and observability.
+  demo:
+    url: "https://demo.event-sourcing.ausdatatech.com.au"
+    label: Open live demo
+  credentials:
+    enabled: true
+    username: none
+    password: none
+    notes: A login is not required to view the demo.
+  github:
+    repo: "https://github.com/PhilipTodd/mining-event-sourcing-reference"
+    issues: "https://github.com/PhilipTodd/mining-event-sourcing-reference/issues"
+  images:
+    landscape: /assets/images/blastiq-screenshot.png
+    portrait: /assets/images/event-sourcing-social-media-Vertical.png
+    alt: Product screenshot placeholder
+  facts:
+    - label: Platform
+      value: Azure
+    - label: IaC
+      value: Bicep
+    - label: CI/CD
+      value: GitHub Actions
+    - label: Branching
+      value: Trunk Based
+
+author:
+  name: Philip Todd
+  url: "https://ausdatatech.com.au/"

@@ -1,257 +1,62 @@
 ---
-layout: default
+layout: page
 title: Architecture
+eyebrow: Design
+description: The system was modelled before coding began. This identified the context within which the system operates including user interactions and components used to build the system.
 permalink: /architecture/
 ---
 
-# Architecture
+### C4 Models:
+This approach to modelling systems implements a hierarchical "drill-down" approach. The top-level context diagram indicates user interaction with the system as a black-box as well as any other systems separate from this that are integrated.
 
-## Overview
+I have separated the views into top level context and container views which show the environment the system operates in as well as the cloud deployable resources. The three final views show dynamic interaction of components during an event or query. 
 
-The **Event Sourcing Reference Platform** demonstrates a production-style cloud-native architecture built on Microsoft Azure using **Event Sourcing**, **CQRS**, and **Domain-Driven Design (DDD)**.
+More information can be found here: 
+[c4model.com](https://c4model.com/){:target="_blank"}
 
-Rather than serving as a proof of concept, this project has been designed to demonstrate architectural patterns commonly used in enterprise systems that require auditability, scalability, resiliency, and eventual consistency.
+### Structurizr
+This tool implements diagrams-as-code which can be displayed and interacted with in a browser. A viewer can drill down into more detailed views. The code for the diagrams can be viewed in the repository in the docs/architecture/structurizr folder.
 
----
+More info:
+[structurizr.com](https://structurizr.com/){:target="_blank"}
 
-## Architecture Principles
 
-The solution has been designed around the following principles:
+{% include c4-diagrams.html %}
 
-- Event-first persistence
-- Clear separation of write and read models
-- Rich domain model encapsulating business rules
-- Asynchronous event processing
-- Independent scalability of application components
-- Cloud-native Azure PaaS services
-- Infrastructure as Code
-- Observability by design
+## How to read these views
 
----
+- **System Context** - who uses it and any external systems it depends on.
+    * A BlastIQ user creates, approves and queries plans via a web interface. 
+    * The user is authenticated by MS Entra ID.
 
-## High-Level Architecture
+- **Container** - the deployable pieces (web, API, data, workers) and their protocols.
+    * An Angular based web application hosted in App Service
+    * Restful API hosted in App Service
+    * Cosmos DB based event store 
+    * Azure SQL for storing projections
+    * Service Bus topic handles routing of events to worker
+    * Azure Function acts as projection worker
 
-> **Diagram coming soon**
+- **Create Blast Plan** - dynamic view - blast plan creation.
 
-<!--
-Replace this placeholder with your exported Structurizr diagram.
+    * Authenticated user enters blast plan details into Web UI
+    * Plan details sent to API via HTTPS Post command
+    * API stores BlastPlanCreated event in Cosmos DB. This begins the immutable event stream
+    * API registers BlastPlanCreated event in Service Bus topic
+    * Azure Function consumes BlastPlanCreated event from Service bus via trigger and inserts new Blast plan record in Azure SQL db
 
-Example:
+- **Approve Blast Plan** - dynamic view - blast plan approval.
 
-![C4 Container Diagram](/assets/images/c4-container.svg)
--->
+    * Authenticated user views blast plan and approves it
+    * Blast plan approve message sent to API via HTTPS Post command
+    * API appends BlastPlanApproved event to event stream associated with plan in Cosmos DB
+    * API registers BlastPlanApproved event in Service Bus topic
+    * Azure Function consumes BlastPlanApproved event from Service bus via trigger and updates existing Blast plan record in Azure SQL db - this achieves "eventual consistency" for blast plan i.e the current status of plan is projected to the SQL DB for querying
 
----
 
-## Request Lifecycle
+- **Query Blast Plan** - dynamic view - querying a blast plan.
 
-A typical command follows the sequence below.
-
-1. User submits a command from the Angular application.
-2. ASP.NET Core validates the request.
-3. Command Handler loads the Aggregate.
-4. Aggregate executes business rules.
-5. One or more Domain Events are produced.
-6. Events are persisted to Azure Cosmos DB.
-7. Events are published to Azure Service Bus Topics.
-8. Projection Workers process new events.
-9. Azure SQL read models are updated.
-10. Queries retrieve optimized read models.
-
----
-
-## Architectural Patterns
-
-| Pattern | Purpose |
-|----------|---------|
-| Event Sourcing | Store immutable domain events rather than current state |
-| CQRS | Separate command and query responsibilities |
-| Domain-Driven Design | Encapsulate business logic inside aggregates |
-| Event-Driven Architecture | Decouple components using asynchronous messaging |
-| Repository Pattern | Abstract persistence concerns |
-| Dependency Injection | Improve modularity and testability |
-| Eventual Consistency | Optimise read performance independently from writes |
-
----
-
-## Solution Architecture
-
-```text
-                Angular Web Application
-                         │
-                         ▼
-               ASP.NET Core Web API
-                         │
-                Command Handlers
-                         │
-                         ▼
-                  Domain Aggregate
-                         │
-                  Domain Events
-                         │
-                         ▼
-               Azure Cosmos DB
-                  Event Store
-                         │
-                         ▼
-                Azure Service Bus
-                         │
-              Projection Workers
-                         │
-                         ▼
-               Azure SQL Database
-                  Read Models
-                         │
-                         ▼
-                  Query Handlers
-                         │
-                         ▼
-                 Angular Web UI
-```
-
----
-
-## Azure Services
-
-| Service | Responsibility |
-|----------|----------------|
-| Azure App Service | Hosts API and web application |
-| Azure Cosmos DB | Event Store |
-| Azure SQL Database | Read model projections |
-| Azure Service Bus Topics | Event distribution |
-| Azure Blob Storage | Static assets and future event archival |
-| Microsoft Entra ID | Authentication and authorization |
-| Application Insights | Telemetry |
-| Log Analytics | Centralised logging |
-| Azure DevOps | Continuous Integration and Deployment |
-| Bicep | Infrastructure as Code |
-
----
-
-## Design Decisions
-
-### Event Sourcing
-
-Business state is derived from an immutable sequence of events rather than storing only the current state. This provides a complete audit history and supports event replay.
-
-### CQRS
-
-Commands and queries are implemented independently. This allows transactional processing and reporting workloads to evolve separately.
-
-### Cosmos DB Event Store
-
-Azure Cosmos DB provides scalable storage for immutable event streams while supporting optimistic concurrency for aggregate consistency.
-
-### SQL Read Models
-
-Read models are projected into Azure SQL to support efficient querying, reporting and dashboard scenarios.
-
-### Service Bus
-
-Azure Service Bus Topics distribute committed events to downstream consumers without tightly coupling projection processing to command execution.
-
----
-
-## Project Structure
-
-```text
-docs/
-├── architecture
-│   ├── adr
-│   ├── assets
-│   └── decisions
-├── assets
-└── decisions
-│
-src/
-└── Backend
-│   └── building-blocks
-│   │   └── BlastPlanning.Contracts
-│   └── functions
-│   │   └── BlastPlanning.ProjectionFunction
-│   └── services
-│       └── blast-planning
-│           ├── BlastPlanning.Api
-│           ├── BlastPlanning.Application
-│           ├── BlastPlanning.Domain
-│           └── BlastPlanning.Infrastructure
-│
-infra/
-└── bicep/
-│   └── environments
-│   │   └── dev
-│   └── modules
-└── pipelines
-│
-tests/
-    ├── Api.Tests/
-    ├── Application.Tests/
-    ├── Domain.Tests/
-    └── Infratructure.Tests/
-```
-
----
-
-## Scalability
-
-The architecture allows each component to scale independently.
-
-- Multiple API instances
-- Independent Projection Workers
-- Partitioned Event Store
-- Independent read database scaling
-- Asynchronous event processing
-- Stateless application services
-
----
-
-## Observability
-
-Operational visibility is provided through:
-
-- Structured logging
-- Distributed tracing
-- Application Insights
-- Azure Monitor
-- Log Analytics
-- Health endpoints
-- Metrics collection
-
----
-
-## Security
-
-Security considerations include:
-
-- Microsoft Entra ID authentication
-- Role-based authorization
-- HTTPS throughout
-- Managed Identities
-- Secure configuration using Azure App Configuration and Key Vault (future enhancement)
-- Principle of least privilege
-
----
-
-## Future Enhancements
-
-Planned enhancements include:
-
-- Snapshotting
-- Outbox Pattern
-- Inbox Pattern
-- Saga orchestration
-- Event versioning
-- Multi-region deployment
-- Geo-replication
-- Distributed tracing with OpenTelemetry
-- Blue/Green deployments
-
----
-
-## Related Documentation
-
-- [Technology Stack](/technology/)
-- [Event Sourcing](/event-sourcing/)
-- [CQRS](/cqrs/)
-- [Deployment](/deployment/)
-- [Roadmap](/roadmap/)
+    * User queries blast plan details using web UI
+    * Blast plan query sent to API via HTTPS Get request
+    * API handles query via domain Query and retrieves most recent plan projection from Azure SQL
+    

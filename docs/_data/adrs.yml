@@ -1,0 +1,23 @@
+# Architecture Decision Records log.
+# Add a row when an ADR is written. Status: Proposed | Accepted | Deprecated | Superseded
+items:
+  - date: 2026-08-28
+    status: Accepted
+    title: "0001-use-shared-azure-platform.md"
+    url: /architecture/adr/0001-use-shared-azure-platform/
+  - date: 2026-08-28
+    status: Accepted
+    title: "0002-host-api-and-ui-using-azure-app-service.md"
+    url: /architecture/adr/0002-host-api-and-ui-using-azure-app-service/
+  - date: 2026-08-28
+    status: Accepted
+    title: "0003-use-cosmos-db-for-event-store-and-azure-sql-for-read-models.md"
+    url: /architecture/adr/0003-use-cosmos-db-for-event-store-and-azure-sql-for-read-models/
+  - date: 2026-08-28
+    status: Accepted
+    title: "0004-use-clean-architecture-for-application-structure.md"
+    url: /architecture/adr/0004-use-clean-architecture-for-application-structure/
+  - date: 2026-08-28
+    status: Accepted
+    title: "0005-use-azure-devops-pipelines-for-ci-cd.md"
+    url: /architecture/adr/0005-use-azure-devops-pipelines-for-ci-cd/

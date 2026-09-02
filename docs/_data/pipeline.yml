@@ -1,0 +1,46 @@
+# Per-pipeline flows. Rendered with {% include pipeline.html id="ci" %}.
+pipelines:
+  - id: ci
+    label: CI
+    stages:
+      - name: Restore
+        detail: Restore the solution packages
+      - name: Lint
+        detail: dotnet format --verify-no-changes
+      - name: Build
+        detail: Release build of the solution
+      - name: Unit tests
+        detail: Domain and Application test projects
+  - id: infra
+    label: Infrastructure
+    stages:
+      - name: Build
+        detail: Compile the Bicep template
+      - name: Validate
+        detail: az deployment sub validate
+      - name: What-If
+        detail: Preview the resource delta
+      - name: Deploy
+        detail: Create the subscription deployment and list resources
+  - id: app
+    label: Application
+    stages:
+      - name: Build and test
+        detail: Restore, build, test, and package API and Function
+      - name: Deploy API
+        detail: Zip-deploy api-adt-blastplanning-dev
+      - name: Deploy Function
+        detail: Zip-deploy func-adt-blastplanning-dev
+      - name: Verify
+        detail: Confirm both hosts are running
+  - id: ui
+    label: UI
+    stages:
+      - name: Lint
+        detail: npm run lint
+      - name: Build
+        detail: Production Angular build and package
+      - name: Deploy
+        detail: Zip-deploy web-adt-blastplanning-dev
+      - name: Verify
+        detail: Confirm the UI host is running

@@ -1,0 +1,23 @@
+# Paths to Structurizr-exported diagrams (SVG or PNG).
+# Drop files into assets/diagrams/ and update the paths.
+levels:
+  - id: context
+    label: System Context
+    src: /assets/diagrams/structurizr-1-SystemContext.svg
+    caption: People and systems that interact with the application.
+  - id: container
+    label: Container
+    src: /assets/diagrams/structurizr-1-Containers.svg
+    caption: Deployable units, data stores, and how they talk.
+  - id: createblastplan
+    label: Create Blast Plan
+    src: /assets/diagrams/structurizr-1-CreateBlastPlan.svg
+    caption: Create
+  - id: approveblastplan
+    label: Approve Blast Plan
+    src: /assets/diagrams/structurizr-1-ApproveBlastPlan.svg
+    caption: Approve
+  - id: queryblastplan
+    label: Query Blast Plan
+    src: /assets/diagrams/structurizr-1-QueryBlastPlans.svg
+    caption: Query

@@ -1,0 +1,13 @@
+items:
+  - status: now
+    title: Security and cloud hardening
+    detail: Move toward Managed Identity and Key Vault, reduce connection-string/secret usage.
+  - status: next
+    title: Observability and operational readiness
+    detail: Build useful Application Insights dashboards/queries covering API latency, failed requests, Function failures, Service Bus backlog and projection lag.
+  - status: later
+    title: Load, performance and scalability testing
+    detail: Add scenarios for realistic create/approve/query workloads, document results, identify the first bottleneck, and demonstrate how the system behaves under projection backlog.
+  - status: later
+    title: Resilience and failure handling
+    detail: Demonstrate retries, dead-letter handling, idempotent projections, duplicate-message processing, transient SQL/Cosmos failures, and recovery.
