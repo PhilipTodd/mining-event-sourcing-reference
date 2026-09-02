@@ -77,4 +77,31 @@
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") setNav(false);
   });
+
+  var lightbox = document.querySelector("[data-lightbox-dialog]");
+  var lightboxImage = lightbox ? lightbox.querySelector("img") : null;
+
+  function closeLightbox() {
+    if (lightbox && lightbox.open) {
+      lightbox.close();
+    }
+  }
+
+  if (lightbox && lightboxImage) {
+    document.querySelectorAll("[data-lightbox]").forEach(function (trigger) {
+      trigger.addEventListener("click", function (event) {
+        event.preventDefault();
+        var image = trigger.querySelector("img");
+        lightboxImage.src = trigger.getAttribute("href") || (image && image.src) || "";
+        lightboxImage.alt = (image && image.alt) || "Expanded diagram";
+        lightbox.showModal();
+      });
+    });
+
+    lightbox.addEventListener("click", function (event) {
+      if (event.target === lightbox) {
+        closeLightbox();
+      }
+    });
+  }
 })();

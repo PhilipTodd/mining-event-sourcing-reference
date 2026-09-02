@@ -22,8 +22,10 @@
       {% unless forloop.first %}hidden{% endunless %}>
       {% if tab.src %}
         <figure class="diagram">
-          <img src="{{ tab.src | relative_url }}" alt="{{ tab.label }}">
-          {% if tab.caption %}<figcaption>{{ tab.caption }}</figcaption>{% endif %}
+          <a class="diagram__zoom" href="{{ tab.src | relative_url }}" data-lightbox aria-label="Expand {{ tab.label }} diagram">
+            <img src="{{ tab.src | relative_url }}" alt="{{ tab.label }}">
+          </a>
+          {% if tab.caption %}<figcaption>{{ tab.caption }}. Click the diagram to enlarge.</figcaption>{% endif %}
         </figure>
       {% else %}
         {{ tab.content | markdownify }}

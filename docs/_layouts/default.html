@@ -7,9 +7,7 @@
     <a class="skip-link" href="#main">Skip to content</a>
     {% include header.html %}
     <div class="shell">
-      {% unless page.layout == 'home' or page.hide_sidebar %}
-        {% include sidebar.html %}
-      {% endunless %}
+      {% include sidebar.html %}
       <div class="main-wrap">
         <main id="main" class="main" tabindex="-1">
           {{ content }}
@@ -17,6 +15,12 @@
         {% include footer.html %}
       </div>
     </div>
+    <dialog class="lightbox" data-lightbox-dialog aria-label="Expanded diagram">
+      <form method="dialog">
+        <button class="btn btn--tiny lightbox__close" type="submit">Close</button>
+      </form>
+      <img alt="">
+    </dialog>
     <script src="{{ '/assets/js/site.js' | relative_url }}"></script>
   </body>
 </html>
